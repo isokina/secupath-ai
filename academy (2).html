@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecuPath Academy | Cyber Defense Field Manual & Quizzes</title>
+    <meta name="description" content="SecuPath Cyber Defense Field Manual & Interactive Knowledge Quizzes. Study Linux permissions, SSH log forensics, port auditing, HTTP security headers, and firewall incident containment.">
+    <meta name="theme-color" content="#0A0A0C">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='38 33 320 373'><rect x='40' y='52' width='286' height='350' rx='24' fill='%233b3934' stroke='%23171613' stroke-width='8'/><rect x='62' y='74' width='242' height='188' rx='22' fill='%23181715'/><rect x='78' y='90' width='210' height='156' rx='15' fill='%23081a07'/><path d='M167 116.8h32v6.4h-32zM147.8 123.2h70.4v6.4h-70.4zM141.4 129.6h83.2v6.4h-83.2zM141.4 136h83.2v6.4h-83.2zM141.4 142.4h32v6.4h-32zM192.6 142.4h32v6.4h-32zM141.4 148.8h25.6v6.4h-25.6zM199 148.8h25.6v6.4h-25.6zM141.4 155.2h25.6v6.4h-25.6zM199 155.2h25.6v6.4h-25.6zM141.4 161.6h32v6.4h-32zM192.6 161.6h32v6.4h-32zM141.4 168h38.4v6.4h-38.4zM186.2 168h38.4v6.4h-38.4zM147.8 174.4h25.6v6.4h-25.6zM192.6 174.4h25.6v6.4h-25.6zM147.8 180.8h25.6v6.4h-25.6zM192.6 180.8h25.6v6.4h-25.6zM154.2 187.2h57.6v6.4h-57.6zM160.6 193.6h44.8v6.4h-44.8zM167 200h32v6.4h-32zM173.4 206.4h19.2v6.4h-19.2zM179.8 212.8h6.4v6.4h-6.4z' fill='%2333ff00'/><rect x='176' y='286' width='118' height='11' rx='5.5' fill='%230e0d0c'/><circle cx='84' cy='338' r='17' fill='%23df5f1d'/><rect x='163' y='327' width='62' height='25' rx='3' fill='%232b0c08' stroke='%23ff6b4a' stroke-width='3'/></svg>">
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem("secupath-theme");
+                if (saved === "light") {
+                    document.documentElement.setAttribute("data-theme", "light");
+                }
+                var savedLang = localStorage.getItem("secupath-lang");
+                if (savedLang === "ru" || savedLang === "en") {
+                    document.documentElement.lang = savedLang;
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0A0A0C;
+            --text-main: #ECE9E0;
+            --text-muted: #8E8B82;
+            --beige-main: #2A2825;
+            --beige-light: #383530;
+            --beige-dark: #1C1B18;
+            --beige-shadow: #121110;
+            --crt-bg: #030804;
+            --crt-green: #33FF00;
+            --crt-glow: rgba(51, 255, 0, 0.25);
+            --accent-orange: #FF5500;
+            --accent-blue: #0088FF;
+            --accent-yellow: #FFCC00;
+            --sp-tag: #33ff00;
+            --sp-tag-filter: url(#spTagGlow);
+            --sp-shadow: 0.55;
+        }
+        html[data-theme="light"] {
+            --bg-color: #F0EDE0;
+            --text-main: #17160F;
+            --text-muted: #5C594F;
+            --crt-green: #1F7A00;
+            --crt-glow: rgba(31, 122, 0, 0.16);
+            --sp-tag: #1F7A00;
+            --sp-tag-filter: none;
+            --sp-shadow: 0.22;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            background-image:
+                radial-gradient(circle at 80% 15%, rgba(51, 255, 0, 0.04) 0%, transparent 45%),
+                radial-gradient(circle at 20% 80%, rgba(255, 85, 0, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, #151519 0%, #0A0A0C 100%);
+            transition: background-color 0.35s ease, color 0.35s ease;
+        }
+        html[data-theme="light"] body {
+            background-image:
+                radial-gradient(circle at 80% 15%, rgba(31, 122, 0, 0.07) 0%, transparent 48%),
+                radial-gradient(circle at 20% 80%, rgba(255, 85, 0, 0.06) 0%, transparent 52%),
+                radial-gradient(circle at 50% 50%, #F7F4E8 0%, #E7E2CE 100%);
+        }
+        .sp-sprite { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
+
+        /* Header */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            background: rgba(10, 10, 12, 0.78);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        html[data-theme="light"] .site-header {
+            background: rgba(240, 237, 224, 0.84);
+            border-bottom-color: rgba(23, 22, 15, 0.08);
+        }
+        .top-nav {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 1.1rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        @media (max-width: 1024px) {
+            .top-nav { padding: 1rem 2rem; }
+        }
+        @media (max-width: 600px) {
+            .top-nav { padding: 0.85rem 1.25rem; gap: 0.75rem; }
+        }
+        .brand-mark {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.72rem;
+            color: var(--text-main);
+            text-decoration: none;
+            line-height: 0;
+            user-select: none;
+            flex-shrink: 0;
+        }
+        .brand-icon {
+            width: 31px;
+            height: 36px;
+            flex-shrink: 0;
+            overflow: visible;
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), filter 0.25s ease;
+        }
+        .brand-word {
+            width: 109.7px;
+            height: 22px;
+            flex-shrink: 0;
+            display: block;
+        }
+        .brand-mark:hover .brand-icon {
+            transform: translateY(-1px) rotate(-3deg);
+            filter: drop-shadow(0 0 10px var(--crt-glow));
+        }
+        .nav-links {
+            display: flex;
+            gap: 1.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+        .nav-links a:hover { color: var(--text-main); }
+        .nav-links a.nav-active {
+            color: var(--crt-green);
+            padding: 0.35rem 0.75rem;
+            border: 1px solid rgba(51, 255, 0, 0.45);
+            border-radius: 4px;
+            background: rgba(51, 255, 0, 0.08);
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+        }
+        .nav-links a.nav-lab {
+            color: var(--crt-green);
+            padding: 0.35rem 0.75rem;
+            border: 1px solid rgba(51, 255, 0, 0.35);
+            border-radius: 4px;
+            background: rgba(51, 255, 0, 0.04);
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+        }
+        .nav-links a.nav-apk {
+            color: var(--bg-color);
+            background: var(--crt-green);
+            padding: 0.35rem 0.8rem;
+            border: 1px solid var(--crt-green);
+            border-radius: 4px;
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+            box-shadow: 0 0 16px rgba(51, 255, 0, 0.28);
+        }
+        html[data-theme="light"] .nav-links a.nav-apk { color: #FBF9F3; box-shadow: none; }
+        .nav-links a.nav-apk .short { display: none; }
+        @media (max-width: 900px) {
+            .nav-links a.opt { display: none; }
+        }
+        @media (max-width: 560px) {
+            .nav-links a.nav-apk .long { display: none; }
+            .nav-links a.nav-apk .short { display: inline; }
+            .nav-links { gap: 0.65rem; }
+        }
+
+        /* Lang Select & Theme Switch */
+        .lang-select-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .lang-select {
+            appearance: none;
+            -webkit-appearance: none;
+            background: linear-gradient(180deg, #161816 0%, #222420 100%);
+            color: var(--crt-green);
+            border: 1px solid rgba(51, 255, 0, 0.35);
+            border-radius: 6px;
+            padding: 0.26rem 1.55rem 0.26rem 0.6rem;
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            line-height: 1.1;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.65);
+        }
+        .lang-select-wrap::after {
+            content: "▾";
+            position: absolute;
+            right: 0.48rem;
+            pointer-events: none;
+            color: var(--crt-green);
+            font-size: 0.75rem;
+        }
+        html[data-theme="light"] .lang-select {
+            background: linear-gradient(180deg, #E2DDD0 0%, #ECE8DC 100%);
+            border-color: rgba(31, 122, 0, 0.45);
+            box-shadow: inset 0 1px 3px rgba(40, 34, 20, 0.15);
+        }
+        .theme-switch {
+            appearance: none;
+            border: 0;
+            background: none;
+            padding: 0.2rem;
+            margin: -0.2rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            color: var(--text-main);
+            border-radius: 999px;
+        }
+        .ts-track {
+            position: relative;
+            width: 58px;
+            height: 30px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #141416 0%, #22201D 100%);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.75);
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 7px;
+        }
+        .ts-hint { width: 13px; height: 13px; color: var(--text-muted); opacity: 0.55; }
+        .ts-knob {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 32% 28%, #57544d 0%, #2d2b28 78%);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--crt-green);
+            transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .ts-knob svg { width: 13px; height: 13px; }
+        .ts-sun { display: none; }
+        html[data-theme="light"] .ts-track {
+            background: linear-gradient(180deg, #DCD6C3 0%, #EAE5D3 100%);
+            border-color: rgba(23, 22, 15, 0.18);
+        }
+        html[data-theme="light"] .ts-knob {
+            transform: translateX(28px);
+            background: radial-gradient(circle at 32% 28%, #FFFDF6 0%, #E7E0CA 80%);
+            color: #C94300;
+        }
+        html[data-theme="light"] .ts-moon { display: none; }
+        html[data-theme="light"] .ts-sun { display: block; }
+
+        /* Page Container & Typography */
+        .page-wrap {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2.5rem 4rem 5rem;
+            flex: 1;
+        }
+        @media (max-width: 1024px) {
+            .page-wrap { padding: 2rem 2rem 4rem; }
+        }
+        @media (max-width: 600px) {
+            .page-wrap { padding: 1.5rem 1.25rem 3.5rem; }
+        }
+
+        .academy-hero {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        html[data-theme="light"] .academy-hero {
+            border-bottom-color: rgba(23, 22, 15, 0.1);
+        }
+        .academy-hero-left {
+            max-width: 760px;
+        }
+        .eyebrow-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'VT323', monospace;
+            font-size: 1.05rem;
+            letter-spacing: 0.12em;
+            color: var(--crt-green);
+            background: rgba(51, 255, 0, 0.08);
+            border: 1px solid rgba(51, 255, 0, 0.3);
+            padding: 0.2rem 0.65rem;
+            border-radius: 4px;
+            margin-bottom: 0.85rem;
+        }
+        .academy-hero h1 {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: clamp(2.6rem, 4.8vw, 4.2rem);
+            font-weight: 400;
+            line-height: 0.98;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.85rem;
+        }
+        .academy-hero h1 em {
+            font-style: italic;
+            color: var(--crt-green);
+        }
+        .academy-hero p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* Telemetry Stats Row */
+        .telemetry-strip {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(130px, 1fr));
+            gap: 0.85rem;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 820px) {
+            .telemetry-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        .telemetry-card {
+            background: linear-gradient(135deg, #272521 0%, #171614 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 0.95rem 1.15rem;
+            box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.06), 0 10px 24px rgba(0, 0, 0, 0.35);
+        }
+        html[data-theme="light"] .telemetry-card {
+            background: linear-gradient(135deg, #FBF9F3 0%, #ECE7D8 100%);
+            border-color: rgba(23, 22, 15, 0.12);
+            box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.85), 0 8px 20px rgba(64, 52, 26, 0.1);
+        }
+        .telemetry-label {
+            font-family: 'VT323', monospace;
+            font-size: 0.92rem;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .telemetry-val {
+            font-family: 'VT323', monospace;
+            font-size: 1.65rem;
+            color: var(--crt-green);
+            letter-spacing: 0.04em;
+            margin-top: 0.15rem;
+        }
+
+        /* Chassis Panel */
+        .chassis-panel {
+            background: linear-gradient(135deg, #272521 0%, #171614 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.08), 0 22px 50px rgba(0, 0, 0, 0.55);
+        }
+        html[data-theme="light"] .chassis-panel {
+            background: linear-gradient(135deg, #FBF9F3 0%, #ECE7D8 100%);
+            border-color: rgba(23, 22, 15, 0.1);
+            box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.85), 0 22px 50px rgba(64, 52, 26, 0.14);
+        }
+
+        /* Module Tabs */
+        .academy-module-tabs {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 980px) {
+            .academy-module-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 560px) {
+            .academy-module-tabs { grid-template-columns: 1fr; }
+        }
+        .academy-mod-btn {
+            appearance: none;
+            text-align: left;
+            padding: 0.95rem 1.05rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #272521 0%, #171614 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: border-color 0.2s ease, transform 0.18s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.38rem;
+        }
+        html[data-theme="light"] .academy-mod-btn {
+            background: linear-gradient(135deg, #FBF9F3 0%, #ECE7D8 100%);
+            border-color: rgba(23, 22, 15, 0.12);
+            box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.85), 0 8px 20px rgba(64, 52, 26, 0.1);
+        }
+        .academy-mod-btn:hover {
+            border-color: rgba(51, 255, 0, 0.45);
+            transform: translateY(-2px);
+        }
+        .academy-mod-btn.active {
+            border-color: var(--crt-green);
+            box-shadow: 0 0 0 1px rgba(51, 255, 0, 0.28), 0 12px 26px rgba(0, 0, 0, 0.45);
+        }
+        .academy-mod-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.4rem;
+            font-family: 'VT323', monospace;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            color: var(--crt-green);
+        }
+        .academy-mod-status {
+            font-size: 0.82rem;
+            padding: 0.05rem 0.42rem;
+            border-radius: 4px;
+            border: 1px solid rgba(51, 255, 0, 0.35);
+            background: rgba(51, 255, 0, 0.08);
+            color: var(--crt-green);
+        }
+        .academy-mod-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.25;
+            color: var(--text-main);
+        }
+        .academy-mod-meta {
+            font-family: 'VT323', monospace;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        /* Workspace Layout */
+        .academy-workspace {
+            display: grid;
+            grid-template-columns: 320px minmax(0, 1fr);
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 980px) {
+            .academy-workspace { grid-template-columns: 1fr; }
+        }
+        .academy-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 1.2rem;
+        }
+        .academy-side-group-label {
+            font-family: 'VT323', monospace;
+            font-size: 0.98rem;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin: 0.15rem 0;
+        }
+        .academy-item-btn {
+            appearance: none;
+            width: 100%;
+            text-align: left;
+            padding: 0.88rem 0.95rem;
+            border-radius: 9px;
+            background: rgba(15, 15, 17, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: border-color 0.18s ease, background 0.18s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        html[data-theme="light"] .academy-item-btn {
+            background: rgba(251, 249, 243, 0.85);
+            border-color: rgba(23, 22, 15, 0.12);
+        }
+        .academy-item-btn:hover {
+            border-color: rgba(51, 255, 0, 0.4);
+        }
+        .academy-item-btn.active {
+            border-color: var(--crt-green);
+            background: rgba(51, 255, 0, 0.08);
+        }
+        .academy-item-kicker {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: 'VT323', monospace;
+            font-size: 0.92rem;
+            color: var(--crt-green);
+            letter-spacing: 0.06em;
+        }
+        .academy-item-title {
+            font-size: 0.93rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .academy-item-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Reader Panel */
+        .academy-reader {
+            padding: 1.85rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.35rem;
+        }
+        @media (max-width: 600px) {
+            .academy-reader { padding: 1.2rem 1.1rem; }
+        }
+        .academy-reader-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.85rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 1.1rem;
+        }
+        .academy-reader-kicker {
+            font-family: 'VT323', monospace;
+            font-size: 1.02rem;
+            letter-spacing: 0.1em;
+            color: var(--crt-green);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+        .academy-reader-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: clamp(1.8rem, 2.8vw, 2.45rem);
+            font-weight: 400;
+            line-height: 1.12;
+            color: var(--text-main);
+            margin: 0;
+        }
+        .academy-reader-summary {
+            font-size: 0.98rem;
+            line-height: 1.58;
+            color: var(--text-muted);
+            margin: 0.4rem 0 0;
+        }
+        .theory-section-card {
+            background: rgba(10, 12, 10, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+            padding: 1.25rem 1.35rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        html[data-theme="light"] .theory-section-card,
+        html[data-theme="light"] .quiz-question-card {
+            background: rgba(255, 253, 247, 0.85);
+            border-color: rgba(23, 22, 15, 0.1);
+        }
+        .theory-section-card h4 {
+            font-size: 1.06rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .theory-section-card h4::before {
+            content: "§";
+            font-family: 'VT323', monospace;
+            color: var(--crt-green);
+            font-size: 1.25rem;
+        }
+        .theory-section-card p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.65;
+            color: var(--text-muted);
+        }
+        .theory-code-box {
+            background: #060906;
+            border: 1px solid rgba(51, 255, 0, 0.28);
+            border-radius: 8px;
+            padding: 0.9rem 1.05rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+        .theory-code-box pre {
+            margin: 0;
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            line-height: 1.42;
+            color: #33FF00;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .theory-code-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px dashed rgba(51, 255, 0, 0.22);
+            padding-top: 0.55rem;
+        }
+        .theory-code-caption {
+            font-family: 'VT323', monospace;
+            font-size: 0.92rem;
+            color: #9BA396;
+            letter-spacing: 0.06em;
+        }
+        .run-in-sandbox-btn {
+            appearance: none;
+            text-decoration: none;
+            font-family: 'VT323', monospace;
+            font-size: 0.98rem;
+            letter-spacing: 0.06em;
+            color: #061004;
+            background: #33FF00;
+            border: 1px solid #33FF00;
+            border-radius: 5px;
+            padding: 0.26rem 0.75rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: filter 0.15s ease, transform 0.15s ease;
+        }
+        .run-in-sandbox-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+        .theory-takeaway {
+            border-left: 3px solid var(--crt-green);
+            background: rgba(51, 255, 0, 0.06);
+            padding: 0.72rem 0.95rem;
+            border-radius: 0 7px 7px 0;
+            font-size: 0.9rem;
+            line-height: 1.52;
+            color: var(--text-main);
+        }
+        .theory-takeaway strong {
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            letter-spacing: 0.08em;
+            color: var(--crt-green);
+            margin-right: 0.35rem;
+        }
+        .academy-reader-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.85rem;
+            padding-top: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            padding: 0.75rem 1.35rem;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        .btn-play {
+            background: var(--crt-green);
+            color: #071204;
+            border-color: var(--crt-green);
+            box-shadow: 0 0 22px rgba(51, 255, 0, 0.25);
+        }
+        html[data-theme="light"] .btn-play { color: #FBF9F3; box-shadow: none; }
+        .btn-outline {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+        }
+        html[data-theme="light"] .btn-outline { border-color: rgba(23, 22, 15, 0.32); }
+        .btn-outline:hover {
+            border-color: var(--crt-green);
+            color: var(--crt-green);
+        }
+
+        /* Quiz Styling */
+        .quiz-question-card {
+            background: rgba(10, 12, 10, 0.68);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 1.2rem 1.3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .quiz-q-prompt {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.45;
+            color: var(--text-main);
+            margin: 0;
+        }
+        .quiz-options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .quiz-opt-btn {
+            appearance: none;
+            width: 100%;
+            text-align: left;
+            padding: 0.72rem 0.95rem;
+            border-radius: 7px;
+            background: rgba(22, 24, 22, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            font-size: 0.92rem;
+            line-height: 1.4;
+            cursor: pointer;
+            transition: border-color 0.16s ease, background 0.16s ease;
+        }
+        html[data-theme="light"] .quiz-opt-btn {
+            background: rgba(244, 240, 228, 0.9);
+            border-color: rgba(23, 22, 15, 0.15);
+        }
+        .quiz-opt-btn:hover {
+            border-color: rgba(51, 255, 0, 0.45);
+        }
+        .quiz-opt-btn.correct {
+            border-color: var(--crt-green);
+            background: rgba(51, 255, 0, 0.14);
+        }
+        .quiz-opt-btn.wrong {
+            border-color: #ff6b4a;
+            background: rgba(255, 107, 74, 0.14);
+        }
+        .quiz-explanation-box {
+            padding: 0.72rem 0.95rem;
+            border-radius: 7px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            border: 1px solid rgba(51, 255, 0, 0.3);
+            background: rgba(51, 255, 0, 0.06);
+            color: var(--text-main);
+        }
+        .quiz-explanation-box.wrong {
+            border-color: rgba(255, 107, 74, 0.45);
+            background: rgba(255, 107, 74, 0.08);
+        }
+
+        /* Footer */
+        .site-footer {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2.5rem 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            font-family: 'VT323', monospace;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+        }
+        @media (max-width: 600px) {
+            .site-footer { padding: 1.75rem 1.25rem; }
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 200;
+            background: #101410;
+            color: #33FF00;
+            border: 1px solid #33FF00;
+            padding: 0.7rem 1.1rem;
+            border-radius: 8px;
+            font-family: 'VT323', monospace;
+            font-size: 1.05rem;
+            letter-spacing: 0.06em;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            transition: opacity 0.22s ease, transform 0.22s ease;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    
+        /* =================================================================
+           POLISH PASS: match the homepage, calmer accents
+           ================================================================= */
+        /* Nav: every link uses the terminal font, same as the homepage */
+        .nav-links a {
+            font-family: 'VT323', 'Courier New', monospace;
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.08em;
+        }
+        /* Nav: plain links like the homepage, underline marks the current page */
+        .nav-links a.nav-active,
+        .nav-links a.nav-lab {
+            padding: 0.35rem 0;
+            border: 0;
+            border-radius: 0;
+            background: none;
+        }
+        .nav-links a.nav-active { color: var(--crt-green); box-shadow: inset 0 -1px 0 currentColor; }
+        .nav-links a.nav-lab { color: var(--text-muted); }
+        .nav-links a.nav-lab:hover { color: var(--text-main); }
+
+        /* APK link: outlined instead of a solid neon block */
+        .nav-links a.nav-apk,
+        html[data-theme="light"] .nav-links a.nav-apk {
+            background: transparent;
+            color: var(--crt-green);
+            border-color: var(--crt-green);
+            box-shadow: none;
+        }
+        .nav-links a.nav-apk:hover { background: rgba(51, 255, 0, 0.08); }
+
+        /* Headline accent matches the homepage's muted italic */
+        .academy-hero h1 em { color: var(--text-muted); }
+
+        /* Primary action: cream button, same as the homepage */
+        .btn-play,
+        html[data-theme="light"] .btn-play {
+            background: var(--text-main);
+            color: var(--bg-color);
+            border-color: var(--text-main);
+            box-shadow: none;
+        }
+        .btn-play:hover { filter: brightness(0.94); }
+
+        /* Run-in-sandbox: terminal-style outline instead of solid neon */
+        .run-in-sandbox-btn {
+            color: #33FF00;
+            background: rgba(51, 255, 0, 0.06);
+            border: 1px solid rgba(51, 255, 0, 0.45);
+            box-shadow: none;
+        }
+        .run-in-sandbox-btn:hover { background: rgba(51, 255, 0, 0.14); filter: none; }
+
+        /* Stats: values fit on one line, cards stay compact */
+        .telemetry-val { font-size: clamp(1.35rem, 1.9vw, 1.65rem); }
+
+        @media (max-width: 980px) { .academy-workspace { grid-template-columns: minmax(0, 1fr); } }
+
+        /* Visible keyboard focus everywhere */
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 2px solid var(--crt-green);
+            outline-offset: 3px;
+        }
+    </style>
+
+    <style id="sp-polish">
+        /* =================================================================
+           SECUPATH ACADEMY POLISH LAYER — refinements only, same palette & fonts
+           ================================================================= */
+        html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+        body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+        ::selection { background: rgba(51,255,0,.25); color: var(--text-main); }
+        html[data-theme="light"] ::selection { background: rgba(31,122,0,.2); }
+
+        html { scrollbar-width: thin; scrollbar-color: rgba(51,255,0,.35) var(--beige-shadow); }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--beige-shadow); }
+        ::-webkit-scrollbar-thumb { background: rgba(51,255,0,.28); border-radius: 10px; border: 2px solid var(--beige-shadow); }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(51,255,0,.5); }
+        html[data-theme="light"] { scrollbar-color: rgba(31,122,0,.4) #E3DDCB; }
+        html[data-theme="light"] ::-webkit-scrollbar-track { background: #E3DDCB; }
+        html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(31,122,0,.4); border-color: #E3DDCB; }
+
+        body::after {
+            content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 9998;
+            background:
+                repeating-linear-gradient(to bottom, rgba(255,255,255,.012) 0 1px, transparent 1px 3px),
+                radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.35) 100%);
+        }
+        html[data-theme="light"] body::after { background: radial-gradient(ellipse at center, transparent 60%, rgba(64,52,26,.08) 100%); }
+
+        /* Header */
+        .nav-links a:not(.nav-apk) { position: relative; }
+        .nav-links a:not(.nav-apk)::after {
+            content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 1px;
+            background: var(--crt-green); box-shadow: 0 0 6px var(--crt-green);
+            transform: scaleX(0); transform-origin: left; transition: transform .25s ease;
+        }
+        .nav-links a:not(.nav-apk):hover::after, .nav-links a.nav-active::after { transform: scaleX(1); }
+
+        /* Hero */
+        .eyebrow-tag { box-shadow: 0 0 18px rgba(51,255,0,.08), inset 0 0 12px rgba(51,255,0,.05); }
+        .academy-hero h1 em { text-shadow: 0 0 24px rgba(142,139,130,.15); }
+
+        /* Telemetry */
+        .telemetry-card { position: relative; overflow: hidden; transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease; }
+        .telemetry-card::before {
+            content: ""; position: absolute; left: 0; top: 0; width: 34px; height: 2px;
+            background: var(--crt-green); box-shadow: 0 0 8px var(--crt-green); opacity: .75; transition: width .3s ease;
+        }
+        .telemetry-card:hover { transform: translateY(-2px); }
+        .telemetry-card:hover::before { width: 72px; }
+        .telemetry-val { text-shadow: 0 0 10px var(--crt-glow); }
+
+        /* Module tabs + syllabus */
+        .academy-mod-btn, .academy-item-btn { transition: border-color .22s ease, background-color .22s ease, transform .22s ease, box-shadow .22s ease; }
+        .academy-mod-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(0,0,0,.4); }
+        .academy-mod-btn.active { box-shadow: 0 0 0 1px rgba(51,255,0,.25), 0 0 26px rgba(51,255,0,.1); }
+        .academy-item-btn:hover { transform: translateX(3px); }
+        .academy-item-btn.active { box-shadow: inset 3px 0 0 var(--crt-green), 0 0 22px rgba(51,255,0,.08); }
+
+        /* Reader */
+        .academy-reader-title { letter-spacing: -.01em; }
+        .theory-section-card, .quiz-question-card { transition: border-color .25s ease, box-shadow .25s ease; }
+        .theory-section-card:hover { box-shadow: 0 14px 34px rgba(0,0,0,.35); }
+        .theory-code-box { box-shadow: inset 0 0 30px rgba(0,0,0,.85), inset 0 0 2px rgba(51,255,0,.25); }
+        .theory-code-box pre { text-shadow: 0 0 6px var(--crt-glow); }
+        .theory-takeaway { box-shadow: 0 0 22px rgba(51,255,0,.05); }
+        .run-in-sandbox-btn { transition: background-color .2s ease, color .2s ease, box-shadow .2s ease, transform .15s ease; }
+        .run-in-sandbox-btn:hover { box-shadow: 0 0 14px var(--crt-glow); }
+        .run-in-sandbox-btn:active { transform: translateY(1px); }
+
+        /* Buttons */
+        .btn { transition: background-color .22s ease, color .22s ease, border-color .22s ease, box-shadow .22s ease, transform .22s ease; }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:active { transform: translateY(1px); }
+
+        /* Quiz */
+        .quiz-opt-btn { transition: border-color .2s ease, background-color .2s ease, transform .15s ease, box-shadow .2s ease; }
+        .quiz-opt-btn:hover { transform: translateX(3px); }
+        .quiz-opt-btn.correct { box-shadow: 0 0 18px rgba(51,255,0,.14); }
+        .quiz-explanation-box { animation: spFadeDown .3s ease both; }
+
+        /* Footer */
+        .site-footer a { transition: color .2s ease; }
+        .site-footer a:hover { color: var(--crt-green); }
+
+        html[data-theme="light"] .academy-mod-btn:hover,
+        html[data-theme="light"] .theory-section-card:hover { box-shadow: 0 12px 26px rgba(64,52,26,.14); }
+        html[data-theme="light"] .academy-mod-btn.active { box-shadow: 0 0 0 1px rgba(31,122,0,.3), 0 8px 20px rgba(64,52,26,.12); }
+        html[data-theme="light"] .theory-code-box pre { text-shadow: none; }
+
+
+        /* Mobile: one-row header, unbroken code lines */
+        @media (max-width: 600px) {
+            .top-nav { flex-wrap: nowrap; }
+            .nav-links { flex-wrap: nowrap; gap: 0.5rem; }
+            .nav-links a:not(.nav-apk) { display: none; }
+            .brand-mark { flex: 0 1 auto; min-width: 0; gap: .5rem; }
+            .brand-word { max-width: 96px; }
+            .nav-links a.nav-apk { white-space: nowrap; padding: .3rem .55rem; flex: none; }
+            .eyebrow-tag { letter-spacing: .06em; }
+            .theory-code-box pre { white-space: pre; word-break: normal; overflow-x: auto; padding-bottom: .25rem; scrollbar-width: thin; }
+            .run-in-sandbox-btn { display: block; width: 100%; text-align: left; overflow-wrap: anywhere; }
+        }
+        @media (max-width: 360px) { .nav-links a.nav-apk { display: none; } }
+        @keyframes spFadeDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .quiz-explanation-box { animation: none !important; }
+            .academy-mod-btn:hover, .academy-item-btn:hover, .telemetry-card:hover, .btn:hover, .quiz-opt-btn:hover { transform: none; }
+        }
+    </style>
+<style id="sp-covers">
+/* ===== SecuPath course thumbnails on module tabs ===== */
+.academy-mod-btn { position: relative; overflow: hidden; }
+.academy-mod-cover {
+    --cv: #33ff00;
+    position: relative;
+    margin: -0.95rem -1.05rem 0.45rem;
+    height: 84px;
+    overflow: hidden;
+    background: #040604;
+    border-bottom: 1px solid color-mix(in srgb, var(--cv) 25%, transparent);
+}
+.academy-mod-cover.lvl-int { --cv: #ffb000; }
+.academy-mod-cover.lvl-adv { --cv: #ff6b4a; }
+.academy-mod-cover .cover-art {
+    display: block; width: 100%; height: 100%;
+    filter: saturate(.6) brightness(.72);
+    transition: filter .3s ease, transform .5s cubic-bezier(.2,.7,.2,1);
+}
+.academy-mod-btn:hover .academy-mod-cover .cover-art { filter: saturate(.95) brightness(.95); transform: scale(1.05); }
+.academy-mod-btn.active .academy-mod-cover .cover-art { filter: saturate(1.05) brightness(1.05); }
+.academy-mod-btn.active .academy-mod-cover { border-bottom-color: var(--crt-green); }
+.academy-mod-cover::before {
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background:
+        repeating-linear-gradient(to bottom, rgba(0,0,0,.28) 0 1px, transparent 1px 3px),
+        radial-gradient(120% 100% at 50% 45%, transparent 50%, rgba(0,0,0,.6) 100%);
+}
+.academy-mod-cover .cover-disk {
+    position: absolute; z-index: 2; top: 7px; left: 8px;
+    font-family: 'VT323', monospace; font-size: .82rem; line-height: 1; letter-spacing: .14em;
+    padding: .18rem .4rem .14rem; border-radius: 4px;
+    color: var(--cv); background: rgba(4,6,4,.72);
+    border: 1px solid color-mix(in srgb, var(--cv) 45%, transparent);
+}
+.cover-art .sp-sweep { transform-box: view-box; transform-origin: 200px 90px; animation: spSpin 4.5s linear infinite; }
+.cover-art .sp-blink { animation: spBlinkC 1.4s ease-in-out infinite; }
+.cover-art .sp-cursor { animation: spCursor 1.1s steps(1) infinite; }
+.cover-art .sp-packet { animation: spPacket 2.4s linear infinite; }
+.cover-art .sp-float { animation: spFloat 4s ease-in-out infinite; }
+.cover-art .sp-dash { animation: spDash 1.2s linear infinite; }
+@keyframes spSpin { to { transform: rotate(-360deg); } }
+@keyframes spBlinkC { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+@keyframes spCursor { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+@keyframes spPacket { 0% { transform: translateX(0); opacity: 0; } 12% { opacity: 1; } 78% { opacity: 1; } 100% { transform: translateX(70px); opacity: 0; } }
+@keyframes spFloat { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-4px,-3px); } }
+@keyframes spDash { to { stroke-dashoffset: -18; } }
+html[data-theme="light"] .academy-mod-btn.active .academy-mod-cover { border-bottom-color: #1F7A00; }
+@media (max-width: 560px) { .academy-mod-cover { height: 96px; } }
+@media (prefers-reduced-motion: reduce) {
+    .cover-art * { animation: none !important; }
+    .academy-mod-cover .cover-art { transition: none; }
+}
+
+</style>
+<script id="sp-covers-data">
+window.SP_COVERS = ["<svg class=\"cover-art\" viewBox=\"-10 -24 420 232\" preserveAspectRatio=\"xMidYMid meet\" xmlns=\"http://www.w3.org/2000/svg\" focusable=\"false\" aria-hidden=\"true\"><defs><radialGradient id=\"cga1\" gradientUnits=\"userSpaceOnUse\" cx=\"200\" cy=\"90\" r=\"240\"><stop offset=\"0\" stop-color=\"#33ff00\" stop-opacity=\".20\"/><stop offset=\".55\" stop-color=\"#33ff00\" stop-opacity=\".05\"/><stop offset=\"1\" stop-color=\"#33ff00\" stop-opacity=\"0\"/></radialGradient><pattern id=\"cpa1\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><path d=\"M20 0H0V20\" fill=\"none\" stroke=\"#33ff00\" stroke-opacity=\".08\"/></pattern><filter id=\"cfa1\" x=\"-30%\" y=\"-30%\" width=\"160%\" height=\"160%\"><feGaussianBlur stdDeviation=\"2.4\" result=\"b\"/><feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge></filter></defs><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"#040604\"/><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"url(#cga1)\"/><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"url(#cpa1)\"/><g filter=\"url(#cfa1)\" fill=\"none\" stroke=\"#33ff00\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M156 28h58l24 24v94h-82z\"/><path d=\"M214 28v24h24\"/><path d=\"M170 70h48M170 84h38M170 98h44M170 112h30\" stroke-opacity=\".45\"/><path d=\"M228 108v-12a14 14 0 0 1 28 0v12\" stroke-width=\"3\"/><rect x=\"218\" y=\"106\" width=\"48\" height=\"38\" rx=\"6\" fill=\"#040604\" stroke-width=\"2.5\"/><circle cx=\"242\" cy=\"121\" r=\"4\" fill=\"#33ff00\"/><path d=\"M242 125v8\" stroke-width=\"3\"/><text x=\"58\" y=\"62\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"19\" fill=\"#33ff00\" text-anchor=\"start\" opacity=\"1\">-rw-------</text><text x=\"58\" y=\"84\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#33ff00\" text-anchor=\"start\" opacity=\"0.6\">u:rw g:-- o:--</text><text x=\"58\" y=\"120\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"22\" fill=\"#ff6b4a\" text-anchor=\"start\" opacity=\"0.75\">0644</text><text x=\"104\" y=\"120\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"22\" fill=\"#F0EDE0\" text-anchor=\"start\" opacity=\"0.5\">&#8594;</text><text x=\"300\" y=\"70\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"16\" fill=\"#33ff00\" text-anchor=\"start\" opacity=\"0.7\">r=4</text><text x=\"300\" y=\"90\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"16\" fill=\"#33ff00\" text-anchor=\"start\" opacity=\"0.7\">w=2</text><text x=\"300\" y=\"110\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"16\" fill=\"#33ff00\" text-anchor=\"start\" opacity=\"0.7\">x=1</text><text x=\"300\" y=\"140\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"30\" fill=\"#33ff00\" text-anchor=\"start\" opacity=\"1\">600</text><rect x=\"334\" y=\"120\" width=\"9\" height=\"18\" fill=\"#33ff00\" stroke=\"none\" class=\"sp-cursor\"/></g></svg>", "<svg class=\"cover-art\" viewBox=\"-10 -24 420 232\" preserveAspectRatio=\"xMidYMid meet\" xmlns=\"http://www.w3.org/2000/svg\" focusable=\"false\" aria-hidden=\"true\"><defs><radialGradient id=\"cga2\" gradientUnits=\"userSpaceOnUse\" cx=\"200\" cy=\"90\" r=\"240\"><stop offset=\"0\" stop-color=\"#33ff00\" stop-opacity=\".20\"/><stop offset=\".55\" stop-color=\"#33ff00\" stop-opacity=\".05\"/><stop offset=\"1\" stop-color=\"#33ff00\" stop-opacity=\"0\"/></radialGradient><pattern id=\"cpa2\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><path d=\"M20 0H0V20\" fill=\"none\" stroke=\"#33ff00\" stroke-opacity=\".08\"/></pattern><filter id=\"cfa2\" x=\"-30%\" y=\"-30%\" width=\"160%\" height=\"160%\"><feGaussianBlur stdDeviation=\"2.4\" result=\"b\"/><feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge></filter></defs><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"#040604\"/><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"url(#cga2)\"/><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"url(#cpa2)\"/><g filter=\"url(#cfa2)\" fill=\"none\" stroke=\"#33ff00\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"110\" y=\"26\" width=\"184\" height=\"128\" rx=\"8\"/><path d=\"M110 44h184\" stroke-opacity=\".6\"/><circle cx=\"122\" cy=\"35\" r=\"2.5\" fill=\"#33ff00\"/><circle cx=\"132\" cy=\"35\" r=\"2.5\" fill=\"#33ff00\" fill-opacity=\".5\"/><circle cx=\"142\" cy=\"35\" r=\"2.5\" fill=\"#33ff00\" fill-opacity=\".3\"/><text x=\"282\" y=\"38\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"12\" fill=\"#33ff00\" text-anchor=\"end\" opacity=\"0.7\">auth.log</text><rect x=\"124\" y=\"58\" width=\"120\" height=\"5\" rx=\"2\" fill=\"#33ff00\" fill-opacity=\"0.35\" stroke=\"none\"/><rect x=\"124\" y=\"72\" width=\"92\" height=\"5\" rx=\"2\" fill=\"#33ff00\" fill-opacity=\"0.35\" stroke=\"none\"/><rect x=\"124\" y=\"86\" width=\"136\" height=\"5\" rx=\"2\" fill=\"#33ff00\" fill-opacity=\"0.35\" stroke=\"none\"/><rect x=\"124\" y=\"100\" width=\"104\" height=\"5\" rx=\"2\" fill=\"#ff6b4a\" fill-opacity=\"0.95\" stroke=\"none\"/><rect x=\"124\" y=\"114\" width=\"128\" height=\"5\" rx=\"2\" fill=\"#33ff00\" fill-opacity=\"0.35\" stroke=\"none\"/><rect x=\"124\" y=\"128\" width=\"84\" height=\"5\" rx=\"2\" fill=\"#33ff00\" fill-opacity=\"0.35\" stroke=\"none\"/><g class=\"sp-float\"><circle cx=\"262\" cy=\"104\" r=\"26\" fill=\"#040604\" fill-opacity=\".75\" stroke-width=\"3\"/><text x=\"262\" y=\"109\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"15\" fill=\"#ff6b4a\" text-anchor=\"middle\" opacity=\"1\">FAILED</text><path d=\"M281 123l22 22\" stroke-width=\"6\"/></g><circle cx=\"62\" cy=\"90\" r=\"15\" stroke-width=\"3\"/><circle cx=\"62\" cy=\"90\" r=\"5\" stroke-opacity=\".6\"/><path d=\"M77 90h22M90 90v9M97 90v6\" stroke-width=\"3\"/><text x=\"62\" y=\"128\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"13\" fill=\"#33ff00\" text-anchor=\"middle\" opacity=\"0.65\">id_ed25519</text><text x=\"330\" y=\"58\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#33ff00\" text-anchor=\"middle\" opacity=\"0.55\">sshd</text><text x=\"330\" y=\"76\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"12\" fill=\"#33ff00\" text-anchor=\"middle\" opacity=\"0.45\">PermitRoot</text><text x=\"330\" y=\"90\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"12\" fill=\"#33ff00\" text-anchor=\"middle\" opacity=\"0.45\">Login no</text></g></svg>", "<svg class=\"cover-art\" viewBox=\"-10 -24 420 232\" preserveAspectRatio=\"xMidYMid meet\" xmlns=\"http://www.w3.org/2000/svg\" focusable=\"false\" aria-hidden=\"true\"><defs><radialGradient id=\"cga3\" gradientUnits=\"userSpaceOnUse\" cx=\"200\" cy=\"90\" r=\"240\"><stop offset=\"0\" stop-color=\"#ffb000\" stop-opacity=\".20\"/><stop offset=\".55\" stop-color=\"#ffb000\" stop-opacity=\".05\"/><stop offset=\"1\" stop-color=\"#ffb000\" stop-opacity=\"0\"/></radialGradient><pattern id=\"cpa3\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><path d=\"M20 0H0V20\" fill=\"none\" stroke=\"#ffb000\" stroke-opacity=\".08\"/></pattern><filter id=\"cfa3\" x=\"-30%\" y=\"-30%\" width=\"160%\" height=\"160%\"><feGaussianBlur stdDeviation=\"2.4\" result=\"b\"/><feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge></filter></defs><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"#040604\"/><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"url(#cga3)\"/><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"url(#cpa3)\"/><g filter=\"url(#cfa3)\" fill=\"none\" stroke=\"#ffb000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"200\" cy=\"90\" r=\"24\" stroke-opacity=\".45\"/><circle cx=\"200\" cy=\"90\" r=\"48\" stroke-opacity=\".45\"/><circle cx=\"200\" cy=\"90\" r=\"72\" stroke-opacity=\".6\"/><path d=\"M124 90h152M200 14v152\" stroke-opacity=\".3\"/><path class=\"sp-sweep\" d=\"M200 90L272 90A72 72 0 0 0 251 39Z\" fill=\"#ffb000\" fill-opacity=\".28\" stroke=\"none\"/><circle cx=\"230\" cy=\"62\" r=\"4\" fill=\"#ffb000\"/><text x=\"238\" y=\"58\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"1\">:22</text><circle cx=\"162\" cy=\"116\" r=\"4\" fill=\"#ffb000\"/><text x=\"132\" y=\"132\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"1\">:80</text><circle cx=\"176\" cy=\"54\" r=\"4\" fill=\"#ffb000\"/><text x=\"146\" y=\"48\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"1\">:443</text><g class=\"sp-blink\"><circle cx=\"244\" cy=\"122\" r=\"6\" fill=\"#ff6b4a\" stroke=\"#ff6b4a\"/><circle cx=\"244\" cy=\"122\" r=\"12\" stroke=\"#ff6b4a\" stroke-opacity=\".5\"/></g><text x=\"260\" y=\"136\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"15\" fill=\"#ff6b4a\" text-anchor=\"start\" opacity=\"1\">:31337 ?</text><text x=\"26\" y=\"60\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"13\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"0.55\">PORT  STATE</text><text x=\"26\" y=\"78\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"0.8\">22    open</text><text x=\"26\" y=\"96\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"0.8\">80    open</text><text x=\"26\" y=\"114\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"0.8\">443   open</text><text x=\"26\" y=\"132\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ff6b4a\" text-anchor=\"start\" opacity=\"1\">31337 ROGUE</text></g></svg>", "<svg class=\"cover-art\" viewBox=\"-10 -24 420 232\" preserveAspectRatio=\"xMidYMid meet\" xmlns=\"http://www.w3.org/2000/svg\" focusable=\"false\" aria-hidden=\"true\"><defs><radialGradient id=\"cga4\" gradientUnits=\"userSpaceOnUse\" cx=\"200\" cy=\"90\" r=\"240\"><stop offset=\"0\" stop-color=\"#ffb000\" stop-opacity=\".20\"/><stop offset=\".55\" stop-color=\"#ffb000\" stop-opacity=\".05\"/><stop offset=\"1\" stop-color=\"#ffb000\" stop-opacity=\"0\"/></radialGradient><pattern id=\"cpa4\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><path d=\"M20 0H0V20\" fill=\"none\" stroke=\"#ffb000\" stroke-opacity=\".08\"/></pattern><filter id=\"cfa4\" x=\"-30%\" y=\"-30%\" width=\"160%\" height=\"160%\"><feGaussianBlur stdDeviation=\"2.4\" result=\"b\"/><feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge></filter></defs><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"#040604\"/><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"url(#cga4)\"/><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"url(#cpa4)\"/><g filter=\"url(#cfa4)\" fill=\"none\" stroke=\"#ffb000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"96\" y=\"24\" width=\"208\" height=\"132\" rx=\"8\"/><path d=\"M96 44h208\" stroke-opacity=\".6\"/><rect x=\"146\" y=\"29\" width=\"118\" height=\"10\" rx=\"5\" stroke-opacity=\".55\" stroke-width=\"1.5\"/><text x=\"154\" y=\"37.5\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"10\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"0.8\">https://secupath.lab</text><circle cx=\"108\" cy=\"34\" r=\"2.5\" fill=\"#ffb000\"/><circle cx=\"118\" cy=\"34\" r=\"2.5\" fill=\"#ffb000\" fill-opacity=\".5\"/><path d=\"M228 58l30 10v22c0 20-14 32-30 40c-16-8-30-20-30-40v-22z\" fill=\"#040604\" stroke-width=\"3\"/><path d=\"M216 92l8 8l16-18\" stroke=\"#33ff00\" stroke-width=\"3.5\"/><text x=\"110\" y=\"70\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"15\" fill=\"#33ff00\" text-anchor=\"start\" opacity=\"1\">HSTS</text><text x=\"150\" y=\"70\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"15\" fill=\"#33ff00\" text-anchor=\"start\" opacity=\"1\">&#10003;</text><text x=\"110\" y=\"92\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"15\" fill=\"#33ff00\" text-anchor=\"start\" opacity=\"1\">CSP</text><text x=\"150\" y=\"92\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"15\" fill=\"#33ff00\" text-anchor=\"start\" opacity=\"1\">&#10003;</text><text x=\"110\" y=\"114\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"15\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"1\">X-FRAME</text><text x=\"110\" y=\"136\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ff6b4a\" text-anchor=\"start\" opacity=\"0.9\">SERVER LEAK</text><path d=\"M30 70h46M30 90h56M30 110h40\" stroke-opacity=\".35\" stroke-dasharray=\"4 5\" class=\"sp-dash\"/><text x=\"318\" y=\"70\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"0.6\">200 OK</text><text x=\"318\" y=\"90\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"0.6\">TLS 1.3</text><text x=\"318\" y=\"110\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ffb000\" text-anchor=\"start\" opacity=\"0.6\">nosniff</text></g></svg>", "<svg class=\"cover-art\" viewBox=\"-10 -24 420 232\" preserveAspectRatio=\"xMidYMid meet\" xmlns=\"http://www.w3.org/2000/svg\" focusable=\"false\" aria-hidden=\"true\"><defs><radialGradient id=\"cga5\" gradientUnits=\"userSpaceOnUse\" cx=\"200\" cy=\"90\" r=\"240\"><stop offset=\"0\" stop-color=\"#ff6b4a\" stop-opacity=\".20\"/><stop offset=\".55\" stop-color=\"#ff6b4a\" stop-opacity=\".05\"/><stop offset=\"1\" stop-color=\"#ff6b4a\" stop-opacity=\"0\"/></radialGradient><pattern id=\"cpa5\" width=\"20\" height=\"20\" patternUnits=\"userSpaceOnUse\"><path d=\"M20 0H0V20\" fill=\"none\" stroke=\"#ff6b4a\" stroke-opacity=\".08\"/></pattern><filter id=\"cfa5\" x=\"-30%\" y=\"-30%\" width=\"160%\" height=\"160%\"><feGaussianBlur stdDeviation=\"2.4\" result=\"b\"/><feMerge><feMergeNode in=\"b\"/><feMergeNode in=\"SourceGraphic\"/></feMerge></filter></defs><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"#040604\"/><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"url(#cga5)\"/><rect x=\"-900\" y=\"-300\" width=\"2200\" height=\"780\" fill=\"url(#cpa5)\"/><g filter=\"url(#cfa5)\" fill=\"none\" stroke=\"#ff6b4a\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"180\" y=\"26\" width=\"40\" height=\"128\" rx=\"2\" fill=\"#0b0403\" stroke-width=\"2.5\"/><path d=\"M180 26h40\" stroke-opacity=\".55\"/><path d=\"M200 26v16\" stroke-opacity=\".45\"/><path d=\"M180 42h40\" stroke-opacity=\".55\"/><path d=\"M190 42v16\" stroke-opacity=\".45\"/><path d=\"M210 42v16\" stroke-opacity=\".45\"/><path d=\"M180 58h40\" stroke-opacity=\".55\"/><path d=\"M200 58v16\" stroke-opacity=\".45\"/><path d=\"M180 74h40\" stroke-opacity=\".55\"/><path d=\"M190 74v16\" stroke-opacity=\".45\"/><path d=\"M210 74v16\" stroke-opacity=\".45\"/><path d=\"M180 90h40\" stroke-opacity=\".55\"/><path d=\"M200 90v16\" stroke-opacity=\".45\"/><path d=\"M180 106h40\" stroke-opacity=\".55\"/><path d=\"M190 106v16\" stroke-opacity=\".45\"/><path d=\"M210 106v16\" stroke-opacity=\".45\"/><path d=\"M180 122h40\" stroke-opacity=\".55\"/><path d=\"M200 122v16\" stroke-opacity=\".45\"/><path d=\"M180 138h40\" stroke-opacity=\".55\"/><path d=\"M190 138v16\" stroke-opacity=\".45\"/><path d=\"M210 138v16\" stroke-opacity=\".45\"/><circle cx=\"62\" cy=\"90\" r=\"22\" stroke-width=\"2.5\"/><circle cx=\"62\" cy=\"90\" r=\"32\" stroke-opacity=\".3\" class=\"sp-blink\"/><text x=\"62\" y=\"96\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"20\" fill=\"#ff6b4a\" text-anchor=\"middle\" opacity=\"1\">C2</text><rect class=\"sp-packet\" style=\"animation-delay:0s\" x=\"96\" y=\"70\" width=\"10\" height=\"6\" rx=\"1\" fill=\"#ff6b4a\" stroke=\"none\"/><rect class=\"sp-packet\" style=\"animation-delay:0.8s\" x=\"96\" y=\"88\" width=\"10\" height=\"6\" rx=\"1\" fill=\"#ff6b4a\" stroke=\"none\"/><rect class=\"sp-packet\" style=\"animation-delay:1.6s\" x=\"96\" y=\"106\" width=\"10\" height=\"6\" rx=\"1\" fill=\"#ff6b4a\" stroke=\"none\"/><path d=\"M168 74l-8 8M168 92l-8 8M168 110l-8 8\" stroke-opacity=\".7\"/><rect x=\"262\" y=\"48\" width=\"74\" height=\"22\" rx=\"4\" stroke=\"#33ff00\"/><circle cx=\"274\" cy=\"59\" r=\"2.5\" fill=\"#33ff00\" stroke=\"none\"/><path d=\"M290 59h36\" stroke=\"#33ff00\" stroke-opacity=\".45\"/><rect x=\"262\" y=\"78\" width=\"74\" height=\"22\" rx=\"4\" stroke=\"#33ff00\"/><circle cx=\"274\" cy=\"89\" r=\"2.5\" fill=\"#33ff00\" stroke=\"none\"/><path d=\"M290 89h36\" stroke=\"#33ff00\" stroke-opacity=\".45\"/><rect x=\"262\" y=\"108\" width=\"74\" height=\"22\" rx=\"4\" stroke=\"#33ff00\"/><circle cx=\"274\" cy=\"119\" r=\"2.5\" fill=\"#33ff00\" stroke=\"none\"/><path d=\"M290 119h36\" stroke=\"#33ff00\" stroke-opacity=\".45\"/><text x=\"200\" y=\"172\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"14\" fill=\"#ff6b4a\" text-anchor=\"middle\" opacity=\"0.85\">DENY OUT 4444</text><text x=\"299\" y=\"146\" font-family=\"VT323, monospace\" stroke=\"none\" font-size=\"13\" fill=\"#33ff00\" text-anchor=\"middle\" opacity=\"0.7\">PROTECTED</text></g></svg>"];
+window.SP_LEVELS = ["beg", "beg", "int", "int", "adv"];
+</script>
+</head>
+<body>
+    <svg class="sp-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" width="0" height="0"><defs>
+<linearGradient id="spFront" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#57544d"/><stop offset=".45" stop-color="#413f3a"/><stop offset="1" stop-color="#2d2b28"/></linearGradient>
+<linearGradient id="spSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c2a26"/><stop offset="1" stop-color="#171613"/></linearGradient>
+<linearGradient id="spTop" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#5f5c55"/><stop offset="1" stop-color="#4a4741"/></linearGradient>
+<linearGradient id="spBezel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#121110"/><stop offset="1" stop-color="#23211e"/></linearGradient>
+<radialGradient id="spGlass" cx=".5" cy=".45" r=".7"><stop offset="0" stop-color="#15390d"/><stop offset=".55" stop-color="#081a07"/><stop offset="1" stop-color="#020602"/></radialGradient>
+<radialGradient id="spKnob" cx=".36" cy=".32" r=".75"><stop offset="0" stop-color="#ffab6b"/><stop offset=".42" stop-color="#df5f1d"/><stop offset="1" stop-color="#7a280b"/></radialGradient>
+<g id="spMarkBody">
+<path d="M46 54 L76 35 L351 35 L324 54 Z" fill="url(#spTop)"/>
+<path d="M322 54 L351 35 Q355 35 356 40 L356 384 L326 403 Z" fill="url(#spSide)"/>
+<rect x="40" y="52" width="286" height="350" rx="16" fill="url(#spFront)"/>
+<rect x="62" y="74" width="242" height="188" rx="22" fill="url(#spBezel)"/>
+<rect x="78" y="90" width="210" height="156" rx="15" fill="url(#spGlass)"/>
+<path d="M167 116.8h32v6.4h-32zM147.8 123.2h70.4v6.4h-70.4zM141.4 129.6h83.2v6.4h-83.2zM141.4 136h83.2v6.4h-83.2zM141.4 142.4h32v6.4h-32zM192.6 142.4h32v6.4h-32zM141.4 148.8h25.6v6.4h-25.6zM199 148.8h25.6v6.4h-25.6zM141.4 155.2h25.6v6.4h-25.6zM199 155.2h25.6v6.4h-25.6zM141.4 161.6h32v6.4h-32zM192.6 161.6h32v6.4h-32zM141.4 168h38.4v6.4h-38.4zM186.2 168h38.4v6.4h-38.4zM147.8 174.4h25.6v6.4h-25.6zM192.6 174.4h25.6v6.4h-25.6zM147.8 180.8h25.6v6.4h-25.6zM192.6 180.8h25.6v6.4h-25.6zM154.2 187.2h57.6v6.4h-57.6zM160.6 193.6h44.8v6.4h-44.8zM167 200h32v6.4h-32zM173.4 206.4h19.2v6.4h-19.2zM179.8 212.8h6.4v6.4h-6.4z" fill="#33ff00"/>
+<rect x="176" y="286" width="118" height="11" rx="5.5" fill="#0e0d0c"/>
+<circle cx="84" cy="338" r="17" fill="url(#spKnob)"/>
+<rect x="163" y="327" width="62" height="25" rx="3" fill="#2b0c08" stroke="#ff6b4a" stroke-opacity=".85" stroke-width="1.2"/>
+</g>
+<path id="spWord" d="M39.45 -63.09Q40.87 -55.76 41.26 -50.2Q40.53 -49.61 37.99 -49.61Q37.3 -51.86 36.62 -53.52Q35.94 -55.18 34.72 -56.93Q33.5 -58.69 32.01 -59.81Q30.52 -60.94 28.27 -61.67Q26.03 -62.4 23.19 -62.4Q18.85 -62.4 15.55 -58.96Q12.26 -55.52 12.26 -51.22Q12.26 -48.88 13.35 -46.8Q14.45 -44.73 15.92 -43.33Q17.38 -41.94 19.73 -40.6Q22.07 -39.26 23.71 -38.57Q25.34 -37.89 27.71 -36.99Q30.08 -36.08 30.71 -35.79Q33.69 -34.52 35.96 -33.08Q38.23 -31.64 40.23 -29.57Q42.24 -27.49 43.31 -24.66Q44.38 -21.83 44.38 -18.41Q44.38 -13.67 41.87 -9.35Q39.36 -5.03 35.01 -2.29Q29.74 0.98 22.66 0.98Q17.87 0.98 12.7 -0.17Q7.52 -1.32 4.69 -1.32Q3.76 -5.08 3.37 -7.96Q2.98 -10.84 2.69 -16.5Q4.3 -17.33 5.96 -16.8Q9.08 -2.59 23.49 -2.59Q29.49 -2.59 32.74 -5.74Q35.99 -8.89 35.99 -14.89Q35.99 -16.99 35.52 -18.77Q35.06 -20.56 34.33 -21.85Q33.59 -23.14 32.42 -24.32Q31.25 -25.49 30.15 -26.22Q29.05 -26.95 27.49 -27.73Q25.93 -28.52 24.8 -28.96L22.02 -29.98Q20.41 -30.62 19.53 -31.01Q16.36 -32.37 13.96 -33.89Q11.57 -35.4 9.45 -37.48Q7.32 -39.55 6.2 -42.33Q5.08 -45.12 5.08 -48.49Q5.08 -56.2 10.67 -61.01Q16.26 -65.82 24.12 -65.82Q28.42 -65.82 30.88 -65.33Q33.35 -64.84 35.35 -64.11Q37.35 -63.38 39.45 -63.09Z M60.89 -28.22 79 -28.52Q80.47 -28.52 80.47 -29.88Q80.47 -32.86 79.74 -35.03Q79 -37.21 77.73 -38.31Q76.46 -39.4 75.1 -39.89Q73.73 -40.38 72.17 -40.38Q71.19 -40.38 70.24 -40.21Q69.29 -40.04 67.75 -39.33Q66.21 -38.62 64.97 -37.4Q63.72 -36.18 62.57 -33.79Q61.43 -31.4 60.89 -28.22ZM87.11 -9.28Q88.77 -9.13 89.21 -7.71Q82.47 0.98 72.17 0.98Q62.35 0.98 56.88 -5.42Q52.2 -10.79 52.2 -20.21Q52.2 -24.61 53.44 -28.47Q54.69 -32.32 56.74 -35.06Q58.79 -37.79 61.4 -39.79Q64.01 -41.8 66.77 -42.75Q69.53 -43.7 72.17 -43.7Q89.06 -43.7 89.06 -26.32Q89.06 -24.61 87.21 -24.61L60.6 -24.8Q60.6 -16.36 63.77 -11.08Q65.97 -7.47 68.87 -5.69Q71.78 -3.91 74.71 -3.91Q78.91 -3.91 81.57 -5.1Q84.23 -6.3 87.11 -9.28Z M132.96 -9.08Q130.57 -5.13 127.81 -2.83Q125.05 -0.54 122.49 0.22Q119.92 0.98 116.65 0.98Q107.37 0.98 102.12 -4.98Q96.88 -10.94 96.88 -20.8Q96.88 -25.93 98.68 -30.37Q100.49 -34.81 103.42 -37.72Q106.35 -40.62 109.99 -42.26Q113.62 -43.9 117.38 -43.9Q124.46 -43.9 128.56 -41.26Q132.67 -38.62 132.67 -34.42Q132.67 -32.32 131.13 -31.15Q129.59 -29.98 127.78 -29.98Q124.37 -29.98 123.97 -33.59Q123.78 -35.16 123.49 -36.21Q123.19 -37.26 122.49 -38.35Q121.78 -39.45 120.36 -40.01Q118.95 -40.58 116.85 -40.58Q111.82 -40.58 108.64 -35.84Q105.47 -31.1 105.47 -23Q105.47 -14.4 109.33 -9.16Q113.18 -3.91 118.85 -3.91Q125.73 -3.91 130.86 -10.5Q132.42 -10.3 132.96 -9.08Z M157.62 0.98Q154.74 0.98 152.49 0.22Q150.24 -0.54 148.8 -1.81Q147.36 -3.08 146.44 -4.86Q145.51 -6.64 145.12 -8.54Q144.73 -10.45 144.73 -12.6V-31.79Q144.73 -36.52 143.48 -38.01Q142.24 -39.5 138.53 -39.79Q138.09 -40.23 138.09 -41.46Q138.09 -42.68 138.53 -43.12Q145.95 -42.92 148.73 -42.92Q151.27 -42.92 152.25 -43.12Q153.03 -43.12 153.03 -42.48Q152.64 -35.16 152.64 -32.18V-14.01Q152.64 -10.89 153.44 -8.69Q154.25 -6.49 155.57 -5.49Q156.88 -4.49 158.11 -4.1Q159.33 -3.71 160.64 -3.71Q162.6 -3.71 165.28 -4.96Q167.97 -6.2 170.65 -8.5Q171.68 -9.38 171.95 -10.13Q172.22 -10.89 172.22 -12.4V-31.69Q172.22 -36.52 171 -38.04Q169.78 -39.55 166.02 -39.79Q165.58 -40.23 165.58 -41.46Q165.58 -42.68 166.02 -43.12Q173.44 -42.92 176.22 -42.92Q178.76 -42.92 179.74 -43.12Q180.52 -43.12 180.52 -42.48Q180.13 -35.16 180.13 -32.18V-12.99Q180.13 -9.13 181.49 -7.59Q182.86 -6.05 187.45 -5.71Q187.89 -5.27 187.89 -4.35Q187.89 -3.42 187.45 -2.98Q179 -2.05 175.34 0.98Q174.22 1.27 173.44 0.98Q172.31 -2.59 172.31 -4.88Q172.31 -5.22 172.12 -5.3Q171.92 -5.37 171.66 -5.27Q171.39 -5.18 171.14 -4.98Q163.72 0.98 157.62 0.98Z M219.32 -57.42 214.43 -32.08Q216.04 -31.59 221.12 -31.59Q228.25 -31.59 232.6 -35.25Q236.94 -38.82 238.5 -46.78Q239.09 -49.76 239.09 -51.95Q239.09 -62.01 228.01 -62.01Q223.17 -62.01 221.44 -60.91Q219.71 -59.81 219.32 -57.42ZM201.74 -7.08 211.5 -57.42Q211.6 -58.11 211.6 -58.35Q211.6 -60.01 210.55 -60.77Q209.5 -61.52 208.13 -61.62L204.42 -61.82Q203.79 -61.82 203.93 -62.4L204.32 -64.5L204.62 -64.7Q211.65 -64.5 216.82 -64.5Q218.97 -64.5 223.66 -64.94Q228.35 -65.38 229.42 -65.38Q233.72 -65.38 237.02 -64.53Q240.31 -63.67 242.26 -62.33Q244.22 -60.99 245.49 -59.13Q246.76 -57.28 247.2 -55.52Q247.64 -53.76 247.64 -51.81Q247.64 -50.2 247.29 -48.58Q246.76 -45.85 245.63 -43.19Q244.51 -40.53 242.34 -37.77Q240.16 -35.01 237.31 -32.93Q234.45 -30.86 230.2 -29.54Q225.96 -28.22 220.93 -28.22Q216.68 -28.22 213.8 -29.2L209.5 -7.08Q209.35 -6.45 209.35 -5.86Q209.35 -4.35 210.43 -3.69Q211.5 -3.03 213.9 -2.88L217.41 -2.69Q218.14 -2.69 218 -1.9L217.61 0L217.41 0.2Q208.43 0 204.32 0Q199.05 0 192.02 0.2L191.82 0L192.22 -1.9Q192.36 -2.69 193.09 -2.69L195.63 -2.88Q198.56 -3.12 199.98 -4.05Q201.4 -4.98 201.74 -7.08Z M281.08 -43.31Q281.96 -43.07 283.06 -43.04Q284.16 -43.02 285.82 -43.07Q287.48 -43.12 288.07 -43.12L281.18 -12.01Q280.16 -7.03 280.16 -6.4Q280.16 -5.62 280.57 -5.3Q280.99 -4.98 281.38 -4.98Q283.13 -4.98 286.99 -10.3Q287.63 -10.3 288.09 -10.03Q288.55 -9.77 288.7 -9.52L289.29 -8.69Q284.89 0.98 276.44 0.98Q272.39 0.98 272.39 -3.52Q272.39 -5.71 273.37 -8.98L274.69 -13.18L274.49 -13.38Q264.77 0.98 257.55 0.98Q247.88 0.98 247.88 -12.5Q247.88 -18.16 250.32 -24Q252.76 -29.83 256.45 -34.13Q260.14 -38.43 264.63 -41.16Q269.12 -43.9 273.07 -43.9Q275.71 -43.9 281.08 -43.31ZM276.05 -21.92Q277.18 -24.76 278.06 -29Q278.93 -33.25 279.23 -36.08L279.57 -38.92Q276.59 -40.82 273.37 -40.82Q270.1 -40.82 266.8 -38.13Q263.5 -35.45 261.16 -31.45Q258.82 -27.44 257.35 -22.75Q255.89 -18.07 255.89 -14.11Q255.89 -4.49 260.28 -4.49Q262.72 -4.49 267.56 -9.84Q272.39 -15.19 276.05 -21.92Z M307.25 -42.92 308.57 -47.9Q308.77 -48.73 309.04 -50.15Q309.31 -51.56 309.53 -52.42Q309.74 -53.27 310.14 -54.22Q310.53 -55.18 311.23 -55.64Q311.94 -56.1 312.97 -56.1Q315.26 -56.1 316.12 -55.44Q316.97 -54.79 316.97 -53.42Q316.97 -52.88 316.75 -51.88Q316.53 -50.88 316.14 -49.37Q315.75 -47.95 315.65 -47.41L314.63 -42.92H324.54Q325.32 -42.33 324.93 -40.87Q324.54 -39.4 323.56 -39.01H313.75L307.84 -12.7Q306.77 -7.91 306.77 -6.4Q306.77 -5.62 307.21 -5.3Q307.65 -4.98 308.04 -4.98Q309.35 -4.98 311.06 -6.25Q312.77 -7.52 316.04 -11.18Q317.8 -11.18 318.24 -9.28Q315.75 -4.79 311.48 -1.9Q307.21 0.98 303.74 0.98Q301.3 0.98 300.08 -0.02Q298.86 -1.03 298.86 -3.61Q298.86 -5.47 300.27 -11.82L306.33 -39.01H299.34Q298.76 -39.01 298.76 -39.21Q298.76 -39.75 299.15 -40.92Q299.54 -42.43 301.93 -42.58Z M336.89 -7.18Q336.75 -6.49 336.53 -5.27Q336.31 -4.05 336.16 -3.34Q336.01 -2.64 335.7 -1.71Q335.38 -0.78 334.99 -0.27Q334.6 0.24 333.91 0.61Q333.23 0.98 332.3 0.98Q330.06 0.98 329.13 0.29Q328.2 -0.39 328.2 -1.71Q328.2 -2.15 328.4 -3Q328.59 -3.86 328.98 -5.22L329.47 -7.18L340.41 -56.3Q341.09 -59.38 341.09 -61.28Q341.09 -62.84 340.58 -63.48Q340.07 -64.11 338.99 -64.11L335.92 -64.31Q335.43 -64.31 335.43 -64.79L335.72 -67.19Q338.8 -67.38 343.27 -68.24Q347.73 -69.09 349.74 -69.82Q350.91 -69.82 350.91 -68.8Q349.88 -64.79 348.42 -58.3L342.36 -31.15Q348.76 -38.62 353.15 -41.26Q357.55 -43.9 361.89 -43.9Q368.53 -43.9 368.53 -35.89Q368.53 -34.28 367.22 -28.32L363.41 -12.4Q362.33 -7.67 362.33 -6.69Q362.33 -4.98 363.31 -4.98Q364.14 -4.98 366.04 -6.42Q367.95 -7.86 369.8 -10.01Q371.51 -10.01 372.1 -8.3Q364.87 0.98 358.23 0.98Q354.13 0.98 354.13 -2.29Q354.13 -4.25 355.84 -11.52L359.6 -27.49Q360.62 -31.98 360.62 -34.18Q360.62 -36.33 359.74 -37.11Q358.87 -37.89 357.11 -37.89Q354.47 -37.89 350.03 -34.01Q345.58 -30.13 340.7 -23.78Z"/></defs>
+<symbol id="sp-mark" viewBox="38 33 320 373" overflow="visible"><use href="#spMarkBody"/></symbol>
+<symbol id="sp-word" viewBox="0.69 -71.82 373.41 74.95"><use href="#spWord" fill="currentColor"/></symbol>
+</svg>
+
+    <header class="site-header">
+        <nav class="top-nav" aria-label="Primary">
+            <a href="./index.html" class="brand-mark" aria-label="SecuPath Home">
+                <svg class="brand-icon" aria-hidden="true" focusable="false"><use href="#sp-mark"/></svg>
+                <svg class="brand-word" aria-hidden="true" focusable="false"><use href="#sp-word"/></svg>
+            </a>
+            <div class="nav-links">
+                <a href="./index.html" data-i18n="nav.backHome">← HOME</a>
+                <a href="./academy.html" class="nav-active" data-i18n="nav.academy">ACADEMY</a>
+                <a href="./index.html#workbench" class="nav-lab opt" data-i18n="nav.lab">SANDBOX LAB</a>
+                <a href="./index.html#tutorDesk" class="opt" data-i18n="nav.mentor">AI MENTOR</a>
+                <a href="./SecuPath-AI.apk" download="SecuPath-AI.apk" class="nav-apk"><span class="long" data-i18n="nav.apkLong">ANDROID APK ↓</span><span class="short" data-i18n="nav.apkShort">APK ↓</span></a>
+                <div class="lang-select-wrap">
+                    <select id="langSelect" class="lang-select" aria-label="Select language" title="Language / Язык">
+                        <option value="en">EN</option>
+                        <option value="ru">RU</option>
+                    </select>
+                </div>
+                <button type="button" class="theme-switch" id="themeSwitch" role="switch" aria-checked="false" aria-label="Light mode" title="Switch theme">
+                    <span class="ts-track" aria-hidden="true">
+                        <svg class="ts-hint ts-hint-moon" viewBox="0 0 24 24"><path fill="currentColor" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        <svg class="ts-hint ts-hint-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="4.6" fill="currentColor" stroke="none"/><path d="M12 1.5v2.2M12 20.3v2.2M1.5 12h2.2M20.3 12h2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
+                        <span class="ts-knob"><svg class="ts-moon" viewBox="0 0 24 24"><path fill="currentColor" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="ts-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="4.6" fill="currentColor" stroke="none"/><path d="M12 1.5v2.2M12 20.3v2.2M1.5 12h2.2M20.3 12h2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg></span>
+                    </span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="page-wrap">
+        <div class="academy-hero">
+            <div class="academy-hero-left">
+                <div class="eyebrow-tag" data-i18n="acad.eyebrow">SECUOS 1.0 // FIELD MANUAL & KNOWLEDGE QUIZZES</div>
+                <h1 data-i18n-html="acad.title">Cyber Defense <em>Academy.</em></h1>
+                <p data-i18n="acad.intro">Study the complete 5-module SecuPath curriculum. Read structured field theory, launch real defensive commands directly into the interactive Terminal Sandbox, and pass deterministic quizzes to earn XP.</p>
+            </div>
+            <div>
+                <a href="./index.html#workbench" class="btn btn-outline" data-i18n="acad.openSandbox">Open Terminal Sandbox ↗</a>
+            </div>
+        </div>
+
+        <div class="telemetry-strip">
+            <div class="telemetry-card">
+                <div class="telemetry-label" data-i18n="stat.lessons">LESSONS STUDIED</div>
+                <div class="telemetry-val" id="statLessonsVal">00 / 10</div>
+            </div>
+            <div class="telemetry-card">
+                <div class="telemetry-label" data-i18n="stat.quizzes">QUIZZES PASSED</div>
+                <div class="telemetry-val" id="statQuizzesVal">0 / 5</div>
+            </div>
+            <div class="telemetry-card">
+                <div class="telemetry-label" data-i18n="stat.xp">ACADEMY XP EARNED</div>
+                <div class="telemetry-val" id="statXpVal">0 XP</div>
+            </div>
+            <div class="telemetry-card">
+                <div class="telemetry-label" data-i18n="stat.rank">OPERATOR STANDING</div>
+                <div class="telemetry-val" id="statRankVal">LVL 01 // INITIATE</div>
+            </div>
+        </div>
+
+        <div class="academy-module-tabs" id="academyModuleTabs" role="tablist" aria-label="Academy courses"></div>
+
+        <div class="academy-workspace">
+            <aside class="academy-sidebar chassis-panel" aria-label="Course lessons and quiz">
+                <div class="academy-side-group-label" id="academySideCourseCode">MOD-01 // SYLLABUS</div>
+                <div id="academyLessonList" style="display:flex; flex-direction:column; gap:0.55rem;"></div>
+            </aside>
+
+            <div class="chassis-panel academy-reader" id="academyReaderPanel" aria-live="polite"></div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <span data-i18n="footer.left">© 2026 SECUPATH // CYBER DEFENSE ACADEMY</span>
+        <a href="./index.html" style="color: var(--crt-green); text-decoration: none;" data-i18n="footer.back">← RETURN TO 3D TERMINAL WORKBENCH</a>
+    </footer>
+
+    <div class="toast-notification" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+    (() => {
+        "use strict";
+        const $ = (id) => document.getElementById(id);
+        const pad2 = (n) => String(n).padStart(2, "0");
+        const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+        const LANG_KEY = "secupath-lang";
+        const ACADEMY_STORAGE_KEY = "secupath.midnight.academy";
+
+        function loadLang() {
+            try {
+                const s = localStorage.getItem(LANG_KEY);
+                if (s === "ru" || s === "en") return s;
+            } catch (e) {}
+            return "en";
+        }
+        let currentLang = loadLang();
+        const isRu = () => currentLang === "ru";
+
+        const i18n = {
+            en: {
+                "nav.backHome": "← HOME",
+                "nav.academy": "ACADEMY",
+                "nav.lab": "SANDBOX LAB",
+                "nav.mentor": "AI MENTOR",
+                "nav.apkLong": "ANDROID APK ↓",
+                "nav.apkShort": "APK ↓",
+                "acad.eyebrow": "SECUOS 1.0 // FIELD MANUAL & KNOWLEDGE QUIZZES",
+                "acad.title": "Cyber Defense <em>Academy.</em>",
+                "acad.intro": "Study the complete 5-module SecuPath curriculum. Read structured field theory, launch real defensive commands directly into the interactive Terminal Sandbox, and pass deterministic quizzes to earn XP.",
+                "acad.openSandbox": "Open Terminal Sandbox ↗",
+                "stat.lessons": "LESSONS STUDIED",
+                "stat.quizzes": "QUIZZES PASSED",
+                "stat.xp": "ACADEMY XP EARNED",
+                "stat.rank": "OPERATOR STANDING",
+                "footer.left": "© 2026 SECUPATH // CYBER DEFENSE ACADEMY",
+                "footer.back": "← RETURN TO 3D TERMINAL WORKBENCH"
+            },
+            ru: {
+                "nav.backHome": "← ГЛАВНАЯ",
+                "nav.academy": "АКАДЕМИЯ",
+                "nav.lab": "ЛАБОРАТОРИЯ",
+                "nav.mentor": "ИИ-МЕНТОР",
+                "nav.apkLong": "СКАЧАТЬ APK ↓",
+                "nav.apkShort": "APK ↓",
+                "acad.eyebrow": "SECUOS 1.0 // ПОЛЕВОЙ УЧЕБНИК И ТЕСТЫ ЗНАНИЙ",
+                "acad.title": "Академия <em>киберзащиты.</em>",
+                "acad.intro": "Изучайте полную учебную программу SecuPath из 5 модулей. Читайте структурированную теорию, запускайте реальные команды защиты в терминальной песочнице и сдавайте проверочные тесты.",
+                "acad.openSandbox": "Открыть терминал-песочницу ↗",
+                "stat.lessons": "ИЗУЧЕНО УРОКОВ",
+                "stat.quizzes": "СДАНО ТЕСТОВ",
+                "stat.xp": "ЗАРАБОТАНО XP",
+                "stat.rank": "РАНГ ОПЕРАТОРА",
+                "footer.left": "© 2026 SECUPATH // АКАДЕМИЯ КИБЕРЗАЩИТЫ",
+                "footer.back": "← ВЕРНУТЬСЯ К 3D-ТЕРМИНАЛУ"
+            }
+        };
+
+        let toastTimer = null;
+        function showToast(msg) {
+            const t = $("toast");
+            if (!t) return;
+            t.textContent = msg;
+            t.classList.add("show");
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove("show"), 2800);
+        }
+
+        const academyCourses = [
+            {
+                id: "course_linux_sec",
+                code: "MOD-01 // PERM.SYS",
+                diskIndex: 0,
+                levelText: "BEGINNER",
+                levelTextRu: "НАЧАЛЬНЫЙ",
+                title: "Linux Security & File Permissions",
+                titleRu: "Безопасность Linux и права доступа",
+                lessons: [
+                    {
+                        id: "lesson_octal_perms",
+                        num: "01.1",
+                        title: "Understanding Octal Permissions (chmod)",
+                        titleRu: "Понимание восьмеричных прав доступа (chmod)",
+                        mins: 8,
+                        xp: 50,
+                        summary: "Master Owner, Group, and World permission bits and secure exposed private keys using chmod 600.",
+                        summaryRu: "Освойте биты прав владельца, группы и остальных пользователей и защитите открытые приватные ключи командой chmod 600.",
+                        sections: [
+                            {
+                                heading: "1. The 10-Character Permission String",
+                                headingRu: "1. 10-символьная строка прав доступа",
+                                body: "Every file and directory on a Linux host is governed by three access scopes: User/Owner (u), Group (g), and Others/World (o). When you inspect a directory with ls -la, the first column shows a 10-character mode string such as -rw-r--r--.",
+                                bodyRu: "Каждый файл и каталог в Linux управляется тремя областями доступа: Владелец (u), Группа (g) и Остальные (o). При проверке каталога командой ls -la первый столбец показывает 10-символьную строку режима, например -rw-r--r--.",
+                                code: "$ ls -la /etc/secupath\n-rw-r--r-- 1 root secops 1679 Oct 24 02:14 vault.key",
+                                runCmd: "ls -la /etc/secupath",
+                                takeaway: "In -rw-r--r--, the owner (root) can read/write, while both the secops group and every other local account can read the file.",
+                                takeawayRu: "В режиме -rw-r--r-- владелец (root) может читать и писать, но группа secops и любой локальный пользователь также могут прочитать файл."
+                            },
+                            {
+                                heading: "2. Calculating Octal Values (4, 2, 1)",
+                                headingRu: "2. Расчёт восьмеричных значений (4, 2, 1)",
+                                body: "Each permission bit carries a numeric weight: Read (r) = 4, Write (w) = 2, Execute (x) = 1. Summing these weights for Owner, Group, and Others produces a 3-digit octal mode: 644 means rw-r--r--, whereas 600 means rw-------.",
+                                bodyRu: "Каждый бит прав имеет числовой вес: Чтение (r) = 4, Запись (w) = 2, Исполнение (x) = 1. Сумма этих весов для Владельца, Группы и Остальных даёт трёхзначный код: 644 означает rw-r--r--, а 600 — rw-------.",
+                                code: "$ chmod 600 /etc/secupath/vault.key\n$ ls -la /etc/secupath/vault.key\n-rw------- 1 root secops 1679 Oct 24 02:14 vault.key",
+                                runCmd: "chmod 600 /etc/secupath/vault.key",
+                                takeaway: "OpenSSH and production vaults refuse to use private keys if group or world permissions are non-zero ('UNPROTECTED PRIVATE KEY FILE'). Always enforce chmod 600 on keys.",
+                                takeawayRu: "OpenSSH и криптохранилища отказываются использовать приватные ключи, если доступ открыт группе или всем остальным. Всегда применяйте chmod 600 к приватным ключам."
+                            }
+                        ]
+                    },
+                    {
+                        id: "lesson_least_privilege",
+                        num: "01.2",
+                        title: "Principle of Least Privilege & Ownership",
+                        titleRu: "Принцип наименьших привилегий и владельцы",
+                        mins: 10,
+                        xp: 60,
+                        summary: "Audit file ownership, service accounts, and why world-readable secrets enable privilege escalation.",
+                        summaryRu: "Аудит владельцев файлов, сервисных аккаунтов и причин, почему доступные всем секреты ведут к повышению привилегий.",
+                        sections: [
+                            {
+                                heading: "1. Lateral Movement via Misconfigured Configs",
+                                headingRu: "1. Горизонтальное продвижение через ошибки конфигурации",
+                                body: "When an attacker gains a low-privilege foothold (such as www-data), their first step is hunting for world-readable credentials or API tokens in /etc, /opt, or /var/backups.",
+                                bodyRu: "Когда атакующий получает низкопривилегированный доступ (например, www-data), первым делом он ищет открытые для чтения ключи и токены в /etc, /opt или /var/backups.",
+                                code: "$ cat /etc/secupath/vault.key\n-----BEGIN SECUPATH VAULT PRIVATE KEY-----\nPROC-TYPE: 4,ENCRYPTED",
+                                runCmd: "cat /etc/secupath/vault.key",
+                                takeaway: "Never use chmod 777 or 666 to 'quickly fix' a permission error. Fix ownership and restrict permissions to 600 or 640.",
+                                takeawayRu: "Никогда не используйте chmod 777 или 666 для «быстрого исправления» ошибки доступа. Настройте владельца и ограничьте права до 600 или 640."
+                            }
+                        ]
+                    }
+                ],
+                quiz: {
+                    id: "quiz_linux_sec",
+                    title: "Linux Permissions & Least Privilege Quiz",
+                    titleRu: "Тест: Права доступа Linux и наименьшие привилегии",
+                    xp: 75,
+                    questions: [
+                        {
+                            q: "What does the permission string '-rw-r--r--' correspond to in octal notation?",
+                            qRu: "Какому восьмеричному значению соответствует строка прав '-rw-r--r--'?",
+                            options: ["0600", "0644", "0755", "0400"],
+                            optionsRu: ["0600", "0644", "0755", "0400"],
+                            answer: 1,
+                            explanation: "Owner has rw- (4+2=6), Group has r-- (4), and Others have r-- (4), giving 0644.",
+                            explanationRu: "Владелец имеет rw- (4+2=6), группа — r-- (4), остальные — r-- (4), что в сумме даёт 0644."
+                        },
+                        {
+                            q: "Which command restricts /etc/secupath/vault.key so ONLY its owner can read and write it?",
+                            qRu: "Какая команда ограничивает /etc/secupath/vault.key так, чтобы ТОЛЬКО владелец мог читать и изменять его?",
+                            options: [
+                                "chmod 644 /etc/secupath/vault.key",
+                                "chmod 755 /etc/secupath/vault.key",
+                                "chmod 600 /etc/secupath/vault.key",
+                                "chmod +r /etc/secupath/vault.key"
+                            ],
+                            optionsRu: [
+                                "chmod 644 /etc/secupath/vault.key",
+                                "chmod 755 /etc/secupath/vault.key",
+                                "chmod 600 /etc/secupath/vault.key",
+                                "chmod +r /etc/secupath/vault.key"
+                            ],
+                            answer: 2,
+                            explanation: "chmod 600 sets rw------- (Owner read/write = 6, Group = 0, World = 0), enforcing least privilege.",
+                            explanationRu: "chmod 600 устанавливает режим rw------- (чтение/запись для владельца = 6, для группы и остальных = 0)."
+                        },
+                        {
+                            q: "True or False: Setting a private key to mode 0644 is safe on a multi-user bastion host as long as nobody has write access.",
+                            qRu: "Верно или неверно: Режим 0644 для приватного ключа безопасен на многопользовательском сервере, пока ни у кого нет прав на запись.",
+                            options: ["True", "False"],
+                            optionsRu: ["Верно", "Неверно"],
+                            answer: 1,
+                            explanation: "False! Mode 0644 allows any local user or compromised service account to read and exfiltrate the private key.",
+                            explanationRu: "Неверно! Режим 0644 позволяет любому локальному пользователю или скомпрометированному сервису прочитать и украсть приватный ключ."
+                        }
+                    ]
+                }
+            },
+            {
+                id: "course_ssh_forensics",
+                code: "MOD-02 // SSH.LOG",
+                diskIndex: 1,
+                levelText: "BEGINNER",
+                levelTextRu: "НАЧАЛЬНЫЙ",
+                title: "SSH Authentication & Log Forensics",
+                titleRu: "Аутентификация SSH и форензика логов",
+                lessons: [
+                    {
+                        id: "lesson_auth_logs",
+                        num: "02.1",
+                        title: "Analyzing /var/log/auth.log for Brute-Force Attacks",
+                        titleRu: "Анализ /var/log/auth.log на предмет брутфорс-атак",
+                        mins: 9,
+                        xp: 60,
+                        summary: "Dissect OpenSSH daemon log entries to pinpoint credential stuffing, username enumeration, and attacker IPs.",
+                        summaryRu: "Разбирайте записи логов демона OpenSSH для выявления перебора паролей, перечисления пользователей и IP-адресов атакующих.",
+                        sections: [
+                            {
+                                heading: "1. Anatomy of an sshd Log Entry",
+                                headingRu: "1. Анатомия записи лога sshd",
+                                body: "On Debian/Ubuntu systems, authentication events are written to /var/log/auth.log. Each line records the timestamp, hostname, process (sshd[PID]), event outcome, target account, source IP, and source port.",
+                                bodyRu: "В системах Debian/Ubuntu события аутентификации записываются в /var/log/auth.log. Каждая строка фиксирует время, имя хоста, процесс (sshd[PID]), результат, целевой аккаунт, IP-адрес источника и порт.",
+                                code: "$ cat /var/log/auth.log\nOct 24 03:11:02 bastion sshd[4190]: Failed password for invalid user admin from 192.168.4.22 port 51204 ssh2",
+                                runCmd: "cat /var/log/auth.log",
+                                takeaway: "Notice 'invalid user' — this indicates username enumeration against accounts that do not exist on the host.",
+                                takeawayRu: "Обратите внимание на 'invalid user' — это признак перебора имён пользователей, которых нет в системе."
+                            },
+                            {
+                                heading: "2. Filtering High-Velocity Failures with grep",
+                                headingRu: "2. Фильтрация лавины ошибок с помощью grep",
+                                body: "Production logs contain thousands of lines. Defenders use grep 'Failed password' /var/log/auth.log to isolate failed authentication bursts and identify the offending source IP.",
+                                bodyRu: "Боевые логи содержат тысячи строк. Защитники используют grep 'Failed password' /var/log/auth.log, чтобы выделить всплески неудачных входов и определить IP атакующего.",
+                                code: "$ grep 'Failed password' /var/log/auth.log",
+                                runCmd: "grep 'Failed password' /var/log/auth.log",
+                                takeaway: "Rapid sequential failures from a single IP across accounts like root, admin, and deploy are a textbook brute-force signature.",
+                                takeawayRu: "Быстрые последовательные ошибки с одного IP по аккаунтам root, admin и deploy — классическая сигнатура брутфорс-атаки."
+                            }
+                        ]
+                    },
+                    {
+                        id: "lesson_ssh_hardening",
+                        num: "02.2",
+                        title: "Hardening sshd_config & Automated Banning",
+                        titleRu: "Укрепление sshd_config и автоматическая блокировка",
+                        mins: 8,
+                        xp: 60,
+                        summary: "Eliminate password brute-forcing permanently with key-only authentication and Fail2Ban jails.",
+                        summaryRu: "Полное устранение риска подбора паролей с помощью входа только по ключам и правил Fail2Ban.",
+                        sections: [
+                            {
+                                heading: "1. Disabling Password & Root Logins",
+                                headingRu: "1. Отключение паролей и входа от имени root",
+                                body: "In /etc/ssh/sshd_config, set PasswordAuthentication no and PermitRootLogin no. Even if an attacker guesses a user's password, sshd will reject the connection unless a valid Ed25519 or RSA key is presented.",
+                                bodyRu: "В файле /etc/ssh/sshd_config установите PasswordAuthentication no и PermitRootLogin no. Даже если атакующий угадает пароль, демон sshd отклонит вход без валидного ключа Ed25519 или RSA.",
+                                code: "PermitRootLogin no\nPasswordAuthentication no\nPubkeyAuthentication yes\nMaxAuthTries 3",
+                                runCmd: "grep 192.168.4.22 /var/log/auth.log",
+                                takeaway: "Combining key-only SSH with Fail2Ban drops brute-force surface area to near zero.",
+                                takeawayRu: "Сочетание входа строго по SSH-ключам и Fail2Ban снижает поверхность брутфорс-атак практически до нуля."
+                            }
+                        ]
+                    }
+                ],
+                quiz: {
+                    id: "quiz_ssh_forensics",
+                    title: "SSH Log Forensics Knowledge Check",
+                    titleRu: "Тест: Форензика логов SSH",
+                    xp: 75,
+                    questions: [
+                        {
+                            q: "Which log file on Ubuntu/Debian systems records SSH authentication attempts?",
+                            qRu: "Какой лог-файл в системах Ubuntu/Debian хранит попытки входа по SSH?",
+                            options: ["/var/log/syslog.conf", "/var/log/auth.log", "/etc/ssh/sshd_config", "/var/log/dmesg"],
+                            optionsRu: ["/var/log/syslog.conf", "/var/log/auth.log", "/etc/ssh/sshd_config", "/var/log/dmesg"],
+                            answer: 1,
+                            explanation: "/var/log/auth.log records PAM and sshd authentication events on Debian/Ubuntu hosts.",
+                            explanationRu: "/var/log/auth.log фиксирует события аутентификации PAM и демона sshd в системах Debian/Ubuntu."
+                        },
+                        {
+                            q: "What does 'Failed password for invalid user admin from 192.168.4.22' indicate?",
+                            qRu: "Что означает запись 'Failed password for invalid user admin from 192.168.4.22'?",
+                            options: [
+                                "The admin user forgot their SSH passphrase",
+                                "An attacker at 192.168.4.22 attempted to log into a non-existent 'admin' account",
+                                "The local firewall blocked port 22",
+                                "The SSH key permissions are 0644"
+                            ],
+                            optionsRu: [
+                                "Пользователь admin забыл свою парольную фразу SSH",
+                                "Атакующий с IP 192.168.4.22 пытался войти под несуществующим аккаунтом 'admin'",
+                                "Локальный файрвол заблокировал порт 22",
+                                "Права на SSH-ключ равны 0644"
+                            ],
+                            answer: 1,
+                            explanation: "'invalid user' means the username does not exist on the system — a classic indicator of automated dictionary attacks.",
+                            explanationRu: "'invalid user' означает, что такого имени пользователя нет в системе — классический признак автоматизированной словарной атаки."
+                        },
+                        {
+                            q: "Which sshd_config directive disables password-based logins in favor of SSH keys?",
+                            qRu: "Какая директива sshd_config отключает вход по паролю в пользу SSH-ключей?",
+                            options: ["PasswordAuthentication no", "PermitEmptyPasswords yes", "UseDNS no", "Port 2222"],
+                            optionsRu: ["PasswordAuthentication no", "PermitEmptyPasswords yes", "UseDNS no", "Port 2222"],
+                            answer: 0,
+                            explanation: "Setting PasswordAuthentication no forces sshd to require cryptographic public-key authentication.",
+                            explanationRu: "Установка PasswordAuthentication no обязывает демон sshd принимать только аутентификацию по криптографическим ключам."
+                        }
+                    ]
+                }
+            },
+            {
+                id: "course_net_recon",
+                code: "MOD-03 // NET.AUDIT",
+                diskIndex: 2,
+                levelText: "INTERMEDIATE",
+                levelTextRu: "СРЕДНИЙ",
+                title: "Network Reconnaissance & Port Auditing",
+                titleRu: "Сетевая разведка и аудит открытых портов",
+                lessons: [
+                    {
+                        id: "lesson_socket_audit",
+                        num: "03.1",
+                        title: "Auditing Listening Sockets with ss & netstat",
+                        titleRu: "Аудит прослушиваемых сокетов через ss и netstat",
+                        mins: 10,
+                        xp: 75,
+                        summary: "Correlate open TCP/UDP ports with running PIDs to uncover unauthorized listeners and reverse shells.",
+                        summaryRu: "Сопоставляйте открытые TCP/UDP порты с запущенными процессами (PID) для обнаружения бэкдоров и обратных шеллов.",
+                        sections: [
+                            {
+                                heading: "1. Listing Active Listeners with ss -tulpn",
+                                headingRu: "1. Список активных слушателей командой ss -tulpn",
+                                body: "When a host behaves suspiciously, defenders inspect listening sockets using ss -tulpn (TCP, UDP, Listening, Processes, Numeric ports). Unlike external scans, ss reveals the exact process name and PID bound to each port.",
+                                bodyRu: "При подозрительной активности хоста защитники проверяют открытые сокеты командой ss -tulpn (TCP, UDP, Listening, Processes, Numeric). В отличие от внешнего сканирования, ss показывает точное имя процесса и PID.",
+                                code: "$ ss -tulpn\nNetid State  Local Address:Port  Process\ntcp   LISTEN 0.0.0.0:22          users:((\"sshd\",pid=812,fd=3))\ntcp   LISTEN 0.0.0.0:4444        users:((\"nc-backdoor\",pid=6612,fd=4))",
+                                runCmd: "ss -tulpn",
+                                takeaway: "Port 4444 is a notorious default listener port used by Metasploit and netcat bind shells.",
+                                takeawayRu: "Порт 4444 — известный стандартный порт, часто используемый пейлоадами Metasploit и бэкдорами на базе netcat."
+                            },
+                            {
+                                heading: "2. Validating Exposure with Nmap Service Scans",
+                                headingRu: "2. Проверка поверхности атаки сканером Nmap",
+                                body: "Running nmap -sV 127.0.0.1 probes open TCP ports and fingerprints service banners, confirming what an attacker on the network segment can reach.",
+                                bodyRu: "Выполнение nmap -sV 127.0.0.1 опрашивает открытые TCP-порты и определяет версии сервисов по их баннерам.",
+                                code: "$ nmap -sV 127.0.0.1\n22/tcp   open  ssh     OpenSSH 9.2p1\n8080/tcp open  http    SecuPath Internal Staging\n4444/tcp open  shell   Netcat rogue bind shell (PID 6612)",
+                                runCmd: "nmap -sV 127.0.0.1",
+                                takeaway: "Bind internal services to 127.0.0.1 instead of 0.0.0.0 unless external access is explicitly required.",
+                                takeawayRu: "Привязывайте внутренние сервисы к 127.0.0.1 вместо 0.0.0.0, если внешний доступ не требуется явно."
+                            }
+                        ]
+                    },
+                    {
+                        id: "lesson_proc_triage",
+                        num: "03.2",
+                        title: "Correlating Rogue Ports with Process Trees (ps aux)",
+                        titleRu: "Сопоставление подозрительных портов с деревом процессов (ps aux)",
+                        mins: 9,
+                        xp: 70,
+                        summary: "Trace a suspicious listening socket back to its binary path, command-line arguments, and parent process.",
+                        summaryRu: "Отследите подозрительный открытый сокет до исполняемого файла, аргументов запуска и родительского процесса.",
+                        sections: [
+                            {
+                                heading: "1. Inspecting Running Processes with ps aux",
+                                headingRu: "1. Анализ запущенных процессов командой ps aux",
+                                body: "Once ss -tulpn identifies a rogue PID (such as PID 6612 on port 4444), run ps aux to see the full command line and user account executing the binary.",
+                                bodyRu: "Как только ss -tulpn выявил подозрительный PID (например, PID 6612 на порту 4444), выполните ps aux, чтобы увидеть полную командную строку и пользователя.",
+                                code: "$ ps aux\nroot 6612 0.1 0.2 9120 2048 ? Ss 03:14 0:00 /tmp/.nc-backdoor -lvnp 4444 -e /bin/sh",
+                                runCmd: "ps aux",
+                                takeaway: "Binaries executing out of world-writable directories like /tmp, /var/tmp, or /dev/shm are high-priority incident indicators.",
+                                takeawayRu: "Процессы, запущенные из доступных на запись всем каталогов (/tmp, /var/tmp, /dev/shm), — критический индикатор компрометации."
+                            }
+                        ]
+                    }
+                ],
+                quiz: {
+                    id: "quiz_net_recon",
+                    title: "Port & Process Auditing Quiz",
+                    titleRu: "Тест: Аудит портов и процессов",
+                    xp: 80,
+                    questions: [
+                        {
+                            q: "In the command 'ss -tulpn', what does the '-p' flag display?",
+                            qRu: "Что выводит флаг '-p' в команде 'ss -tulpn'?",
+                            options: [
+                                "Packet payload in hexadecimal",
+                                "The process name and PID owning each socket",
+                                "Only public IPv6 addresses",
+                                "Ping latency to remote peers"
+                            ],
+                            optionsRu: [
+                                "Полезную нагрузку пакетов в hex-формате",
+                                "Имя процесса и его PID, владеющий сокетом",
+                                "Только публичные IPv6-адреса",
+                                "Задержку ping до удалённых узлов"
+                            ],
+                            answer: 1,
+                            explanation: "The -p (--processes) flag shows the process name and PID bound to the socket.",
+                            explanationRu: "Флаг -p (--processes) показывает имя процесса и идентификатор PID, привязанный к сокету."
+                        },
+                        {
+                            q: "What is the security difference between a service listening on 127.0.0.1:8080 vs 0.0.0.0:8080?",
+                            qRu: "В чём разница в безопасности между прослушиванием 127.0.0.1:8080 и 0.0.0.0:8080?",
+                            options: [
+                                "127.0.0.1 is accessible only from the local machine; 0.0.0.0 accepts connections on all network interfaces",
+                                "0.0.0.0 encrypts traffic automatically",
+                                "127.0.0.1 is for UDP only",
+                                "There is no difference"
+                            ],
+                            optionsRu: [
+                                "127.0.0.1 доступен только локально на хосте; 0.0.0.0 принимает соединения со всех сетевых интерфейсов",
+                                "0.0.0.0 автоматически шифрует трафик",
+                                "127.0.0.1 работает только для UDP",
+                                "Разницы нет"
+                            ],
+                            answer: 0,
+                            explanation: "Binding to 127.0.0.1 restricts traffic to the loopback interface, whereas 0.0.0.0 exposes the port to external networks.",
+                            explanationRu: "Привязка к 127.0.0.1 ограничивает доступ петлевым интерфейсом хоста, тогда как 0.0.0.0 открывает порт для внешних сетей."
+                        },
+                        {
+                            q: "Why is a process running from '/tmp/.nc-backdoor' a major red flag?",
+                            qRu: "Почему процесс, запущенный из '/tmp/.nc-backdoor', является серьёзным сигналом тревоги?",
+                            options: [
+                                "Legitimate system daemons run from /usr/sbin or /usr/bin, whereas attackers drop payloads into world-writable /tmp with leading dots to hide them",
+                                "/tmp only supports shell scripts",
+                                "Processes in /tmp cannot use TCP",
+                                "It uses too much RAM"
+                            ],
+                            optionsRu: [
+                                "Легитимные системные службы запускаются из /usr/sbin или /usr/bin, тогда как атакующие часто сохраняют пейлоады в доступный всем /tmp со скрытым именем через точку",
+                                "/tmp поддерживает только shell-скрипты",
+                                "Процессы в /tmp не могут использовать TCP",
+                                "Он потребляет слишком много оперативной памяти"
+                            ],
+                            answer: 0,
+                            explanation: "Attackers frequently use /tmp because any low-privilege user can write and execute files there unless /tmp is mounted with noexec.",
+                            explanationRu: "Атакующие часто используют /tmp, так как любой пользователь может записывать туда файлы, если раздел не смонтирован с опцией noexec."
+                        }
+                    ]
+                }
+            },
+            {
+                id: "course_web_sec",
+                code: "MOD-04 // HTTP.HDR",
+                diskIndex: 3,
+                levelText: "INTERMEDIATE",
+                levelTextRu: "СРЕДНИЙ",
+                title: "Web Application Security & HTTP Headers",
+                titleRu: "Веб-безопасность и HTTP-заголовки",
+                lessons: [
+                    {
+                        id: "lesson_http_headers",
+                        num: "04.1",
+                        title: "HTTP Response Headers & Information Disclosure",
+                        titleRu: "HTTP-заголовки ответа и утечка данных",
+                        mins: 9,
+                        xp: 75,
+                        summary: "Use curl -I to inspect HTTP response headers, catch leaked debug tokens, and enforce defensive headers.",
+                        summaryRu: "Используйте curl -I для проверки HTTP-заголовков, обнаружения отладочных токенов и настройки защитных заголовков.",
+                        sections: [
+                            {
+                                heading: "1. Inspecting Headers with curl -I",
+                                headingRu: "1. Проверка заголовков командой curl -I",
+                                body: "Every HTTP response includes metadata headers before the body. Staging servers frequently leak internal software versions, backend node names, or debug tokens inside custom X-* headers.",
+                                bodyRu: "Каждый HTTP-ответ содержит метаданные в заголовках. Тестовые серверы часто раскрывают версии ПО, имена внутренних узлов или отладочные токены в заголовках X-*.",
+                                code: "$ curl -I http://localhost:8080\nHTTP/1.1 200 OK\nServer: SecuPath-Staging/0.9-debug\nX-SecuPath-Flag: SECUPATH{HTTP_HEADER_LEAK_8080}",
+                                runCmd: "curl -I http://localhost:8080",
+                                takeaway: "Strip debug headers (X-Powered-By, X-Debug-Token) and set ServerTokens Prod before deploying to production.",
+                                takeawayRu: "Удаляйте отладочные заголовки (X-Powered-By, X-Debug-Token) и скрывайте версии сервера перед выходом в продакшен."
+                            }
+                        ]
+                    },
+                    {
+                        id: "lesson_defensive_headers",
+                        num: "04.2",
+                        title: "Hardening Web Servers with HSTS, CSP & X-Frame-Options",
+                        titleRu: "Укрепление веб-серверов через HSTS, CSP и X-Frame-Options",
+                        mins: 9,
+                        xp: 75,
+                        summary: "Protect browsers against XSS, clickjacking, and protocol downgrade attacks using standard security headers.",
+                        summaryRu: "Защитите браузеры пользователей от XSS, кликджекинга и понижения протокола с помощью заголовков безопасности.",
+                        sections: [
+                            {
+                                heading: "1. Essential Defensive Response Headers",
+                                headingRu: "1. Ключевые защитные заголовки ответа",
+                                body: "Modern web applications enforce defense-in-depth by instructing the browser how to handle content: Strict-Transport-Security (HSTS) enforces HTTPS, Content-Security-Policy (CSP) blocks unauthorized inline scripts, and X-Content-Type-Options: nosniff prevents MIME sniffing.",
+                                bodyRu: "Современные веб-приложения реализуют эшелонированную защиту через инструкции браузеру: Strict-Transport-Security (HSTS) требует HTTPS, Content-Security-Policy (CSP) блокирует инъекции скриптов, а X-Content-Type-Options: nosniff запрещает угадывание MIME-типов.",
+                                code: "Strict-Transport-Security: max-age=63072000; includeSubDomains\nContent-Security-Policy: default-src 'self'\nX-Content-Type-Options: nosniff\nX-Frame-Options: DENY",
+                                runCmd: "curl -i http://localhost:8080",
+                                takeaway: "Auditing response headers with curl -I is one of the fastest ways to verify web hardening in CI/CD pipelines.",
+                                takeawayRu: "Аудит заголовков командой curl -I — один из самых быстрых способов проверить базовую защиту веб-сервера."
+                            }
+                        ]
+                    }
+                ],
+                quiz: {
+                    id: "quiz_web_sec",
+                    title: "HTTP Headers & Web Defense Quiz",
+                    titleRu: "Тест: HTTP-заголовки и защита веб-приложений",
+                    xp: 80,
+                    questions: [
+                        {
+                            q: "Which curl flag fetches ONLY the HTTP response headers (sending a HEAD request)?",
+                            qRu: "Какой флаг команды curl запрашивает ТОЛЬКО HTTP-заголовки ответа (HEAD-запрос)?",
+                            options: ["curl -X POST", "curl -I", "curl -d", "curl -o"],
+                            optionsRu: ["curl -X POST", "curl -I", "curl -d", "curl -o"],
+                            answer: 1,
+                            explanation: "curl -I (or --head) issues an HTTP HEAD request and prints only the response headers.",
+                            explanationRu: "curl -I (или --head) отправляет HTTP HEAD-запрос и выводит только заголовки ответа."
+                        },
+                        {
+                            q: "Why is returning 'Server: Apache/2.4.49 (Unix) OpenSSL/1.1.1k' considered a security risk?",
+                            qRu: "Почему возврат заголовка 'Server: Apache/2.4.49 (Unix) OpenSSL/1.1.1k' считается риском безопасности?",
+                            options: [
+                                "It slows down TLS handshakes",
+                                "It reveals exact software versions, allowing attackers to match known CVEs immediately",
+                                "It disables HTTP/2",
+                                "It breaks browser caching"
+                            ],
+                            optionsRu: [
+                                "Это замедляет TLS-рукопожатие",
+                                "Это раскрывает точные версии ПО, позволяя атакующим мгновенно подобрать известные эксплойты (CVE)",
+                                "Это отключает протокол HTTP/2",
+                                "Это ломает кэширование в браузере"
+                            ],
+                            answer: 1,
+                            explanation: "Verbose server banners give attackers exact version numbers to look up public exploits (such as CVE-2021-41773).",
+                            explanationRu: "Подробные баннеры сервера дают атакующим точные номера версий для поиска готовых публичных эксплойтов."
+                        },
+                        {
+                            q: "Which HTTP response header mitigates Cross-Site Scripting (XSS) by restricting where scripts can be loaded from?",
+                            qRu: "Какой HTTP-заголовок снижает риск межсайтового скриптинга (XSS), ограничивая источники загрузки скриптов?",
+                            options: ["Content-Security-Policy", "X-Powered-By", "Accept-Encoding", "Cache-Control"],
+                            optionsRu: ["Content-Security-Policy", "X-Powered-By", "Accept-Encoding", "Cache-Control"],
+                            answer: 0,
+                            explanation: "Content-Security-Policy (CSP) defines approved origins for scripts, styles, and connections, blocking injected XSS payloads.",
+                            explanationRu: "Content-Security-Policy (CSP) задаёт доверенные источники для скриптов и ресурсов, блокируя выполнение XSS-инъекций."
+                        }
+                    ]
+                }
+            },
+            {
+                id: "course_defensive_ir",
+                code: "MOD-05 // UFW.IR",
+                diskIndex: 4,
+                levelText: "ADVANCED",
+                levelTextRu: "ПРОДВИНУТЫЙ",
+                title: "Defensive Firewall & Incident Containment",
+                titleRu: "Защитный файрвол и локализация инцидентов",
+                lessons: [
+                    {
+                        id: "lesson_ufw_containment",
+                        num: "05.1",
+                        title: "Blocking Command-and-Control (C2) Beacons with UFW",
+                        titleRu: "Блокировка C2-маяков с помощью файрвола UFW",
+                        mins: 11,
+                        xp: 90,
+                        summary: "Detect outbound C2 callbacks in syslog/netstat and sever attacker persistence at the host firewall.",
+                        summaryRu: "Обнаруживайте исходящие C2-соединения и обрывайте канал управления атакующего на уровне хостового файрвола.",
+                        sections: [
+                            {
+                                heading: "1. Spotting Outbound C2 Beacons",
+                                headingRu: "1. Выявление исходящих C2-маяков",
+                                body: "Modern malware rarely waits for inbound connections; instead, it dials out ('beacons') to an external Command-and-Control server. Inspecting /var/log/syslog or active sockets reveals periodic outbound traffic to untrusted IPs such as 203.0.113.99.",
+                                bodyRu: "Современное вредоносное ПО редко ждёт входящих соединений — вместо этого оно само стучится («маякует») на внешний C2-сервер. Проверка /var/log/syslog выявляет периодический трафик на подозрительные IP, такие как 203.0.113.99.",
+                                code: "$ cat /var/log/syslog\nOct 24 03:40:19 bastion beacon-d[6612]: outbound heartbeat -> 203.0.113.99:8443",
+                                runCmd: "cat /var/log/syslog",
+                                takeaway: "Always monitor both inbound listening ports and unexpected outbound connections from server processes.",
+                                takeawayRu: "Всегда контролируйте как входящие порты прослушивания, так и неожиданные исходящие соединения от серверных процессов."
+                            },
+                            {
+                                heading: "2. Immediate Host Containment with ufw deny",
+                                headingRu: "2. Немедленная изоляция угрозы командой ufw deny",
+                                body: "During an active incident, defenders isolate the malicious endpoint immediately by inserting a host firewall block rule: ufw deny from 203.0.113.99.",
+                                bodyRu: "Во время активного инцидента защитники немедленно изолируют враждебный узел, добавляя блокирующее правило файрвола: ufw deny from 203.0.113.99.",
+                                code: "$ ufw status\n$ ufw deny from 203.0.113.99",
+                                runCmd: "ufw deny from 203.0.113.99",
+                                takeaway: "Blocking the C2 IP severs the attacker's interactive control channel while preserving memory and disk artifacts for forensic triage.",
+                                takeawayRu: "Блокировка IP-адреса C2 обрывает интерактивный канал управления атакующего, сохраняя артефакты на диске и в памяти для криминалистики."
+                            }
+                        ]
+                    },
+                    {
+                        id: "lesson_ir_lifecycle",
+                        num: "05.2",
+                        title: "Incident Response Lifecycle: Containment vs Eradication",
+                        titleRu: "Жизненный цикл реагирования: Изоляция против Устранения",
+                        mins: 10,
+                        xp: 90,
+                        summary: "Follow NIST SP 800-61 incident response phases so you don't destroy forensic evidence during containment.",
+                        summaryRu: "Следуйте фазам реагирования NIST SP 800-61, чтобы не уничтожить криминалистические улики при изоляции угрозы.",
+                        sections: [
+                            {
+                                heading: "1. Why Defenders Contain Before Rebooting",
+                                headingRu: "1. Почему защитники изолируют сеть перед перезагрузкой",
+                                body: "Rebooting a compromised server immediately wipes volatile memory (RAM), active network sockets, and running process trees. By blocking the C2 IP at the firewall first, you stop data exfiltration while keeping volatile forensic artifacts intact.",
+                                bodyRu: "Немедленная перезагрузка скомпрометированного сервера стирает оперативную память (RAM), активные сокеты и дерево процессов. Блокируя IP C2-сервера на файрволе, вы останавливаете утечку данных, сохраняя улики в памяти.",
+                                code: "$ ufw status\nStatus: active\nTo                         Action      From\n--                         ------      ----\n22/tcp                     ALLOW       Anywhere\nAnywhere                   DENY        203.0.113.99",
+                                runCmd: "ufw status",
+                                takeaway: "Containment first, forensic snapshot second, eradication and credential rotation third.",
+                                takeawayRu: "Сначала сетевая изоляция, затем снятие криминалистического слепка и только потом очистка и ротация ключей."
+                            }
+                        ]
+                    }
+                ],
+                quiz: {
+                    id: "quiz_defensive_ir",
+                    title: "Firewall & Incident Response Quiz",
+                    titleRu: "Тест: Файрвол и реагирование на инциденты",
+                    xp: 100,
+                    questions: [
+                        {
+                            q: "Why do attackers prefer outbound reverse shells / C2 beacons over inbound bind shells?",
+                            qRu: "Почему атакующие предпочитают исходящие C2-маяки (reverse shell) входящим соединениям (bind shell)?",
+                            options: [
+                                "Outbound traffic is often permitted through perimeter NAT and firewalls that block incoming connections",
+                                "Outbound connections do not use TCP",
+                                "Outbound connections hide the process from ps",
+                                "Inbound connections require root privileges on port 4444"
+                            ],
+                            optionsRu: [
+                                "Исходящий трафик часто разрешён через NAT и периметровые файрволы, которые блокируют входящие подключения",
+                                "Исходящие соединения не используют протокол TCP",
+                                "Исходящие соединения скрывают процесс из вывода ps",
+                                "Входящие соединения на порт 4444 требуют прав root"
+                            ],
+                            answer: 0,
+                            explanation: "Corporate and cloud firewalls typically block unsolicited inbound ports by default, but allow outbound egress traffic.",
+                            explanationRu: "Корпоративные и облачные файрволы обычно блокируют входящие подключения по умолчанию, но разрешают исходящие соединения."
+                        },
+                        {
+                            q: "Which UFW command blocks traffic from the rogue C2 server 203.0.113.99?",
+                            qRu: "Какая команда UFW блокирует трафик от враждебного C2-сервера 203.0.113.99?",
+                            options: [
+                                "ufw allow 203.0.113.99",
+                                "ufw status 203.0.113.99",
+                                "ufw deny from 203.0.113.99",
+                                "chmod 600 203.0.113.99"
+                            ],
+                            optionsRu: [
+                                "ufw allow 203.0.113.99",
+                                "ufw status 203.0.113.99",
+                                "ufw deny from 203.0.113.99",
+                                "chmod 600 203.0.113.99"
+                            ],
+                            answer: 2,
+                            explanation: "'ufw deny from 203.0.113.99' adds a netfilter rule dropping packets from that malicious IP.",
+                            explanationRu: "Команда 'ufw deny from 203.0.113.99' добавляет правило фильтрации, отбрасывающее пакеты с указанного враждебного IP."
+                        },
+                        {
+                            q: "Why should you isolate a host with firewall rules BEFORE rebooting it during an incident?",
+                            qRu: "Почему во время инцидента следует изолировать хост правилами файрвола ПЕРЕД его перезагрузкой?",
+                            options: [
+                                "Rebooting destroys volatile forensic evidence in RAM and active process tables",
+                                "UFW rules only work before a reboot",
+                                "Rebooting opens port 22 to everyone",
+                                "Linux cannot reboot while a socket is open"
+                            ],
+                            optionsRu: [
+                                "Перезагрузка уничтожает летучие криминалистические улики в оперативной памяти (RAM) и таблице процессов",
+                                "Правила UFW работают только до перезагрузки",
+                                "Перезагрузка открывает порт 22 для всех",
+                                "Linux не может перезагрузиться при открытом сокете"
+                            ],
+                            answer: 0,
+                            explanation: "Isolating network traffic stops the bleeding immediately while preserving RAM and running process state for forensic capture.",
+                            explanationRu: "Сетевая изоляция мгновенно пресекает активность атакующего, сохраняя содержимое RAM и запущенных процессов для экспертизы."
+                        }
+                    ]
+                }
+            }
+        ];
+
+        function loadAcademyState() {
+            try {
+                const raw = localStorage.getItem(ACADEMY_STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    return {
+                        modIdx: clamp(Number(parsed.modIdx) || 0, 0, academyCourses.length - 1),
+                        itemKey: parsed.itemKey || "lesson:0",
+                        completedLessons: new Set(Array.isArray(parsed.completedLessons) ? parsed.completedLessons : []),
+                        passedQuizzes: new Set(Array.isArray(parsed.passedQuizzes) ? parsed.passedQuizzes : []),
+                        quizAnswers: parsed.quizAnswers && typeof parsed.quizAnswers === "object" ? parsed.quizAnswers : {}
+                    };
+                }
+            } catch (e) {}
+            return {
+                modIdx: 0,
+                itemKey: "lesson:0",
+                completedLessons: new Set(),
+                passedQuizzes: new Set(),
+                quizAnswers: {}
+            };
+        }
+
+        const acadState = loadAcademyState();
+
+        function saveAcademyState() {
+            try {
+                localStorage.setItem(ACADEMY_STORAGE_KEY, JSON.stringify({
+                    modIdx: acadState.modIdx,
+                    itemKey: acadState.itemKey,
+                    completedLessons: [...acadState.completedLessons],
+                    passedQuizzes: [...acadState.passedQuizzes],
+                    quizAnswers: acadState.quizAnswers
+                }));
+            } catch (e) {}
+        }
+
+        function calcAcademyXP() {
+            let xp = 0;
+            academyCourses.forEach((c) => {
+                c.lessons.forEach((l) => {
+                    if (acadState.completedLessons.has(l.id)) xp += l.xp;
+                });
+                if (acadState.passedQuizzes.has(c.quiz.id)) xp += c.quiz.xp;
+            });
+            return xp;
+        }
+
+        function totalLessonsCount() {
+            return academyCourses.reduce((acc, c) => acc + c.lessons.length, 0);
+        }
+
+        function rankFromXP(xp) {
+            if (xp >= 800) return isRu() ? "УР. 04 // КОМАНДИР SOC" : "LVL 04 // SOC COMMANDER";
+            if (xp >= 450) return isRu() ? "УР. 03 // СТ. АНАЛИТИК" : "LVL 03 // SR. ANALYST";
+            if (xp >= 200) return isRu() ? "УР. 02 // ЗАЩИТНИК" : "LVL 02 // DEFENDER";
+            return isRu() ? "УР. 01 // КУРСАНТ" : "LVL 01 // INITIATE";
+        }
+
+        function renderAcademy() {
+            const tabsEl = $("academyModuleTabs");
+            const listEl = $("academyLessonList");
+            const readerEl = $("academyReaderPanel");
+            const sideCodeEl = $("academySideCourseCode");
+            if (!tabsEl || !listEl || !readerEl) return;
+
+            const totalLes = totalLessonsCount();
+            const doneLes = acadState.completedLessons.size;
+            const doneQuiz = acadState.passedQuizzes.size;
+            const xp = calcAcademyXP();
+
+            if ($("statLessonsVal")) $("statLessonsVal").textContent = `${pad2(doneLes)} / ${pad2(totalLes)}`;
+            if ($("statQuizzesVal")) $("statQuizzesVal").textContent = `${doneQuiz} / ${academyCourses.length}`;
+            if ($("statXpVal")) $("statXpVal").textContent = `${xp} XP`;
+            if ($("statRankVal")) $("statRankVal").textContent = rankFromXP(xp);
+
+            tabsEl.innerHTML = "";
+            academyCourses.forEach((course, idx) => {
+                const modLesDone = course.lessons.filter((l) => acadState.completedLessons.has(l.id)).length;
+                const modQuizDone = acadState.passedQuizzes.has(course.quiz.id);
+                const allModDone = modLesDone === course.lessons.length && modQuizDone;
+
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "academy-mod-btn" + (idx === acadState.modIdx ? " active" : "");
+                btn.setAttribute("role", "tab");
+                btn.setAttribute("aria-selected", idx === acadState.modIdx ? "true" : "false");
+
+                const statusText = allModDone
+                    ? (isRu() ? "ГОТОВО ✓" : "DONE ✓")
+                    : `${modLesDone + (modQuizDone ? 1 : 0)}/${course.lessons.length + 1}`;
+
+                btn.innerHTML = `
+                    ${window.SP_COVERS && window.SP_COVERS[course.diskIndex] ? `<div class="academy-mod-cover lvl-${window.SP_LEVELS[course.diskIndex]}" aria-hidden="true">${window.SP_COVERS[course.diskIndex]}<span class="cover-disk">DISK-0${course.diskIndex + 1}</span></div>` : ""}
+                    <div class="academy-mod-top">
+                        <span>${course.code.split(" // ")[0]}</span>
+                        <span class="academy-mod-status">${statusText}</span>
+                    </div>
+                    <div class="academy-mod-title">${isRu() ? course.titleRu : course.title}</div>
+                    <div class="academy-mod-meta">${isRu() ? course.levelTextRu : course.levelText} • DISK-0${course.diskIndex + 1}</div>
+                `;
+                btn.addEventListener("click", () => {
+                    acadState.modIdx = idx;
+                    acadState.itemKey = "lesson:0";
+                    saveAcademyState();
+                    renderAcademy();
+                });
+                tabsEl.appendChild(btn);
+            });
+
+            const activeCourse = academyCourses[acadState.modIdx] || academyCourses[0];
+            if (sideCodeEl) {
+                sideCodeEl.textContent = isRu()
+                    ? `${activeCourse.code} // ПРОГРАММА МОДУЛЯ`
+                    : `${activeCourse.code} // SYLLABUS`;
+            }
+
+            listEl.innerHTML = "";
+            activeCourse.lessons.forEach((les, lIdx) => {
+                const key = `lesson:${lIdx}`;
+                const isDone = acadState.completedLessons.has(les.id);
+                const itemBtn = document.createElement("button");
+                itemBtn.type = "button";
+                itemBtn.className = "academy-item-btn" + (acadState.itemKey === key ? " active" : "");
+                itemBtn.innerHTML = `
+                    <div class="academy-item-kicker">
+                        <span>${isRu() ? "УРОК" : "LESSON"} ${les.num}</span>
+                        <span>${isDone ? (isRu() ? "ИЗУЧЕНО ✓" : "COMPLETED ✓") : `+${les.xp} XP`}</span>
+                    </div>
+                    <div class="academy-item-title">${isRu() ? les.titleRu : les.title}</div>
+                    <div class="academy-item-sub">${les.mins} ${isRu() ? "мин чтения • теория + команды" : "min read • theory + commands"}</div>
+                `;
+                itemBtn.addEventListener("click", () => {
+                    acadState.itemKey = key;
+                    saveAcademyState();
+                    renderAcademy();
+                });
+                listEl.appendChild(itemBtn);
+            });
+
+            const quizKey = "quiz";
+            const quizDone = acadState.passedQuizzes.has(activeCourse.quiz.id);
+            const quizBtn = document.createElement("button");
+            quizBtn.type = "button";
+            quizBtn.className = "academy-item-btn" + (acadState.itemKey === quizKey ? " active" : "");
+            quizBtn.innerHTML = `
+                <div class="academy-item-kicker">
+                    <span>${isRu() ? "ПРОВЕРКА ЗНАНИЙ" : "KNOWLEDGE CHECK"}</span>
+                    <span>${quizDone ? (isRu() ? "СДАНО ✓" : "PASSED ✓") : `+${activeCourse.quiz.xp} XP`}</span>
+                </div>
+                <div class="academy-item-title">${isRu() ? activeCourse.quiz.titleRu : activeCourse.quiz.title}</div>
+                <div class="academy-item-sub">${activeCourse.quiz.questions.length} ${isRu() ? "вопроса • мгновенная проверка" : "questions • instant grading"}</div>
+            `;
+            quizBtn.addEventListener("click", () => {
+                acadState.itemKey = quizKey;
+                saveAcademyState();
+                renderAcademy();
+            });
+            listEl.appendChild(quizBtn);
+
+            readerEl.innerHTML = "";
+            if (acadState.itemKey === "quiz") {
+                renderAcademyQuiz(readerEl, activeCourse);
+            } else {
+                const lIdx = clamp(parseInt(acadState.itemKey.split(":")[1], 10) || 0, 0, activeCourse.lessons.length - 1);
+                renderAcademyLesson(readerEl, activeCourse, activeCourse.lessons[lIdx], lIdx);
+            }
+        }
+
+        function renderAcademyLesson(container, course, les, lIdx) {
+            const isDone = acadState.completedLessons.has(les.id);
+            const header = document.createElement("div");
+            header.className = "academy-reader-header";
+            header.innerHTML = `
+                <div>
+                    <div class="academy-reader-kicker">${course.code} // ${isRu() ? "УРОК" : "LESSON"} ${les.num} • ${les.mins} ${isRu() ? "МИН" : "MIN"}</div>
+                    <h2 class="academy-reader-title">${isRu() ? les.titleRu : les.title}</h2>
+                    <p class="academy-reader-summary">${isRu() ? les.summaryRu : les.summary}</p>
+                </div>
+            `;
+            container.appendChild(header);
+
+            les.sections.forEach((sec) => {
+                const card = document.createElement("div");
+                card.className = "theory-section-card";
+
+                const h4 = document.createElement("h4");
+                h4.textContent = isRu() ? sec.headingRu : sec.heading;
+                card.appendChild(h4);
+
+                const p = document.createElement("p");
+                p.textContent = isRu() ? sec.bodyRu : sec.body;
+                card.appendChild(p);
+
+                if (sec.code) {
+                    const codeBox = document.createElement("div");
+                    codeBox.className = "theory-code-box";
+                    const pre = document.createElement("pre");
+                    pre.textContent = sec.code;
+                    codeBox.appendChild(pre);
+
+                    if (sec.runCmd) {
+                        const actions = document.createElement("div");
+                        actions.className = "theory-code-actions";
+                        const cap = document.createElement("span");
+                        cap.className = "theory-code-caption";
+                        cap.textContent = isRu()
+                            ? `СВЯЗАНО С ДИСКЕТОЙ DISK-0${course.diskIndex + 1}`
+                            : `LINKED TO SANDBOX DISK-0${course.diskIndex + 1}`;
+                        const runLink = document.createElement("a");
+                        runLink.className = "run-in-sandbox-btn";
+                        runLink.href = `./index.html?disk=${course.diskIndex}&cmd=${encodeURIComponent(sec.runCmd)}#workbench`;
+                        runLink.textContent = isRu()
+                            ? `Выполнить в песочнице: ${sec.runCmd} ↗`
+                            : `Run in Sandbox Lab: ${sec.runCmd} ↗`;
+                        actions.appendChild(cap);
+                        actions.appendChild(runLink);
+                        codeBox.appendChild(actions);
+                    }
+                    card.appendChild(codeBox);
+                }
+
+                if (sec.takeaway) {
+                    const take = document.createElement("div");
+                    take.className = "theory-takeaway";
+                    take.innerHTML = `<strong>${isRu() ? "ВЫВОД ЗАЩИТНИКА:" : "DEFENDER TAKEAWAY:"}</strong> ${isRu() ? sec.takeawayRu : sec.takeaway}`;
+                    card.appendChild(take);
+                }
+
+                container.appendChild(card);
+            });
+
+            const footer = document.createElement("div");
+            footer.className = "academy-reader-footer";
+
+            const doneBtn = document.createElement("button");
+            doneBtn.type = "button";
+            doneBtn.className = isDone ? "btn btn-outline" : "btn btn-play";
+            doneBtn.textContent = isDone
+                ? (isRu() ? `Урок изучен (+${les.xp} XP) ✓` : `Lesson Completed (+${les.xp} XP) ✓`)
+                : (isRu() ? `Отметить урок изученным (+${les.xp} XP)` : `Mark Lesson Completed (+${les.xp} XP)`);
+            doneBtn.addEventListener("click", () => {
+                if (acadState.completedLessons.has(les.id)) {
+                    acadState.completedLessons.delete(les.id);
+                } else {
+                    acadState.completedLessons.add(les.id);
+                    showToast(isRu() ? `Урок ${les.num} изучен! +${les.xp} XP` : `Lesson ${les.num} completed! +${les.xp} XP`);
+                }
+                saveAcademyState();
+                renderAcademy();
+            });
+
+            const nextBtn = document.createElement("button");
+            nextBtn.type = "button";
+            nextBtn.className = "btn btn-outline";
+            const hasNextLesson = lIdx + 1 < course.lessons.length;
+            nextBtn.textContent = hasNextLesson
+                ? (isRu() ? "Следующий урок →" : "Next Lesson →")
+                : (isRu() ? "Перейти к тесту модуля →" : "Take Module Quiz →");
+            nextBtn.addEventListener("click", () => {
+                if (!acadState.completedLessons.has(les.id)) {
+                    acadState.completedLessons.add(les.id);
+                }
+                acadState.itemKey = hasNextLesson ? `lesson:${lIdx + 1}` : "quiz";
+                saveAcademyState();
+                renderAcademy();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+
+            footer.appendChild(doneBtn);
+            footer.appendChild(nextBtn);
+            container.appendChild(footer);
+        }
+
+        function renderAcademyQuiz(container, course) {
+            const quiz = course.quiz;
+            const savedAnswers = acadState.quizAnswers[quiz.id] || {};
+            const isPassed = acadState.passedQuizzes.has(quiz.id);
+
+            const header = document.createElement("div");
+            header.className = "academy-reader-header";
+            header.innerHTML = `
+                <div>
+                    <div class="academy-reader-kicker">${course.code} // ${isRu() ? "ПРОВЕРКА ЗНАНИЙ" : "KNOWLEDGE CHECK"} • +${quiz.xp} XP</div>
+                    <h2 class="academy-reader-title">${isRu() ? quiz.titleRu : quiz.title}</h2>
+                    <p class="academy-reader-summary">${isRu()
+                        ? "Выберите правильный ответ для каждого вопроса. Объяснение появится сразу после выбора."
+                        : "Select the correct answer for each question. Instant explanations appear as you answer."}</p>
+                </div>
+            `;
+            container.appendChild(header);
+
+            quiz.questions.forEach((qObj, qIdx) => {
+                const qCard = document.createElement("div");
+                qCard.className = "quiz-question-card";
+
+                const prompt = document.createElement("p");
+                prompt.className = "quiz-q-prompt";
+                prompt.textContent = `${qIdx + 1}. ${isRu() ? qObj.qRu : qObj.q}`;
+                qCard.appendChild(prompt);
+
+                const optsWrap = document.createElement("div");
+                optsWrap.className = "quiz-options-list";
+                const opts = isRu() ? qObj.optionsRu : qObj.options;
+                const chosenIdx = savedAnswers[qIdx];
+
+                opts.forEach((optText, oIdx) => {
+                    const optBtn = document.createElement("button");
+                    optBtn.type = "button";
+                    let cls = "quiz-opt-btn";
+                    if (chosenIdx !== undefined) {
+                        if (oIdx === qObj.answer) cls += " correct";
+                        else if (oIdx === chosenIdx && chosenIdx !== qObj.answer) cls += " wrong";
+                    }
+                    optBtn.className = cls;
+                    optBtn.textContent = optText;
+                    optBtn.addEventListener("click", () => {
+                        if (!acadState.quizAnswers[quiz.id]) acadState.quizAnswers[quiz.id] = {};
+                        acadState.quizAnswers[quiz.id][qIdx] = oIdx;
+
+                        const allCorrect = quiz.questions.every((item, idx) => acadState.quizAnswers[quiz.id][idx] === item.answer);
+                        if (allCorrect && !acadState.passedQuizzes.has(quiz.id)) {
+                            acadState.passedQuizzes.add(quiz.id);
+                            showToast(isRu()
+                                ? `Тест модуля сдан! +${quiz.xp} XP`
+                                : `Module Quiz Passed! +${quiz.xp} XP`);
+                        }
+                        saveAcademyState();
+                        renderAcademy();
+                    });
+                    optsWrap.appendChild(optBtn);
+                });
+                qCard.appendChild(optsWrap);
+
+                if (chosenIdx !== undefined) {
+                    const exp = document.createElement("div");
+                    const isRight = chosenIdx === qObj.answer;
+                    exp.className = "quiz-explanation-box" + (isRight ? "" : " wrong");
+                    const statusPrefix = isRight
+                        ? (isRu() ? "✓ ВЕРНО: " : "✓ CORRECT: ")
+                        : (isRu() ? "✗ НЕВЕРНО: " : "✗ INCORRECT: ");
+                    exp.textContent = statusPrefix + (isRu() ? qObj.explanationRu : qObj.explanation);
+                    qCard.appendChild(exp);
+                }
+
+                container.appendChild(qCard);
+            });
+
+            const footer = document.createElement("div");
+            footer.className = "academy-reader-footer";
+
+            const statusBadge = document.createElement("div");
+            statusBadge.className = "eyebrow-tag";
+            statusBadge.style.marginBottom = "0";
+            statusBadge.textContent = isPassed
+                ? (isRu() ? `СТАТУС: ТЕСТ СДАН (+${quiz.xp} XP) ✓` : `STATUS: QUIZ PASSED (+${quiz.xp} XP) ✓`)
+                : (isRu() ? "ОТВЕТЬТЕ ВЕРНО НА ВСЕ ВОПРОСЫ ДЛЯ ЗАЧЁТА" : "ANSWER ALL QUESTIONS CORRECTLY TO PASS");
+
+            const labJumpLink = document.createElement("a");
+            labJumpLink.className = "btn btn-outline";
+            labJumpLink.href = `./index.html?disk=${course.diskIndex}#workbench`;
+            labJumpLink.textContent = isRu()
+                ? `Открыть миссию DISK-0${course.diskIndex + 1} в терминале ↗`
+                : `Launch DISK-0${course.diskIndex + 1} in Sandbox Lab ↗`;
+
+            footer.appendChild(statusBadge);
+            footer.appendChild(labJumpLink);
+            container.appendChild(footer);
+        }
+
+        function applyLanguage(lang) {
+            currentLang = lang === "ru" ? "ru" : "en";
+            document.documentElement.lang = currentLang;
+            const langSelect = $("langSelect");
+            if (langSelect && langSelect.value !== currentLang) {
+                langSelect.value = currentLang;
+            }
+            try {
+                localStorage.setItem(LANG_KEY, currentLang);
+            } catch (e) {}
+
+            const dict = i18n[currentLang] || i18n.en;
+            document.querySelectorAll("[data-i18n]").forEach((el) => {
+                const k = el.getAttribute("data-i18n");
+                if (dict[k] !== undefined) el.textContent = dict[k];
+            });
+            document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+                const k = el.getAttribute("data-i18n-html");
+                if (dict[k] !== undefined) el.innerHTML = dict[k];
+            });
+
+            renderAcademy();
+        }
+
+        const langSelect = $("langSelect");
+        if (langSelect) {
+            langSelect.value = currentLang;
+            langSelect.addEventListener("change", (e) => applyLanguage(e.target.value));
+        }
+
+        // Support ?module=0..4 URL param
+        try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has("module")) {
+                const m = parseInt(params.get("module"), 10);
+                if (!Number.isNaN(m)) {
+                    acadState.modIdx = clamp(m, 0, academyCourses.length - 1);
+                    acadState.itemKey = "lesson:0";
+                }
+            }
+        } catch (e) {}
+
+        applyLanguage(currentLang);
+    })();
+    </script>
+    <script>
+    (function () {
+        var root = document.documentElement;
+        var btn = document.getElementById("themeSwitch");
+        var meta = document.querySelector('meta[name="theme-color"]');
+        function current() { return root.getAttribute("data-theme") === "light" ? "light" : "dark"; }
+        function apply(theme) {
+            var light = theme === "light";
+            if (light) { root.setAttribute("data-theme", "light"); } else { root.removeAttribute("data-theme"); }
+            if (btn) {
+                btn.setAttribute("aria-checked", light ? "true" : "false");
+                btn.title = light ? "Switch to dark mode" : "Switch to light mode";
+            }
+            if (meta) { meta.setAttribute("content", light ? "#F0EDE0" : "#0A0A0C"); }
+        }
+        apply(current());
+        if (!btn) return;
+        btn.addEventListener("click", function () {
+            var next = current() === "light" ? "dark" : "light";
+            try { localStorage.setItem("secupath-theme", next); } catch (e) {}
+            apply(next);
+        });
+    })();
+    </script>
+</body>
+</html>
